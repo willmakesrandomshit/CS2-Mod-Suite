@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="0" />
+  <DisplayName Value="Discord RPC" />
+  <ShortDescription Value="Custom, private-by-default Discord Rich Presence" />
+  <LongDescription><![CDATA[Discord RPC gives Cities: Skylines II a richer, configurable Discord presence without opening a second Discord connection.
+
+FEATURES
+
+• Live city activity, population, date, season, weather, temperature and optional traffic flow.
+• Private-by-default city names and configurable population/treasury precision.
+• Custom Details and State templates with readable tokens.
+• Session timer and activity preview.
+• Connection diagnostics, manual refresh and automatic reconnect attempts.
+• Companion activity for Access Studio, Road Rules, Event Engine and Traffic Stress Lab.
+• One-click disable restores the vanilla Cities: Skylines II rich-presence updater.
+
+SAFE ARCHITECTURE
+
+Discord RPC reuses the official Discord Game SDK client already created by Cities: Skylines II (client ID 1125009418476605441). It does not ship another SDK, request a token, launch a helper process or create competing Discord ownership.
+
+PRIVACY
+
+City name sharing is OFF by default. Population is rounded by default. Treasury is hidden by default. Save paths, account names and mod lists are never transmitted.
+
+BETA NOTE
+
+This package remains an unlisted beta until a real Discord desktop client accepts and visibly displays its activity during the release-gate test.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <Tag Value="Code Mod" />
+  <ModVersion Value="0.9.0-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <ChangeLog><![CDATA[0.9.0-beta.1
+
+• Shared-client Discord Game SDK architecture.
+• Custom presence templates and live preview.
+• Private, Social and Detailed privacy presets.
+• Population, money, date, season, weather and traffic tokens.
+• Reconnect state and callback diagnostics.
+• Companion mod activity priority with automatic expiry.
+• Cooperative vanilla updater restoration.
+
+Unlisted beta: public release requires visible Discord-client runtime proof.]]></ChangeLog>
+  <AccessLevel Value="Unlisted" />
+</Publish>

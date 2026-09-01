@@ -1,0 +1,8 @@
+{
+  "id": "AccessStudio",
+  "name": "Access Studio",
+  "version": "0.3.3-alpha.1",
+  "author": "progamer8785",
+  "description": "Move supported building service access and restore vanilla behavior — Public Early Alpha",
+  "entry": "AccessStudio.mjs"
+}

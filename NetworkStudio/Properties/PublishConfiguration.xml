@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155650" />
+  <DisplayName Value="Network Studio — Road Furniture &amp; Sign Placement" />
+  <ShortDescription Value="Move speed signs, street lamps, signals, and props off asphalt to road verges with live preview." />
+  <LongDescription>
+⚠️ **BETA / PUBLIC TEST BUILD (v0.1.0)**
+
+*Network Studio is an experimental road customization and prop manipulation tool.*
+
+---
+
+**Clean up your road networks.** Network Studio allows you to customize the position, lateral offset, and placement of road furniture, overhead gantries, street lamps, and traffic signals across any road segment in your city.
+
+### Key Features
+- **Road Furniture Detection**: Identifies all attached subobjects and props along any selected road or highway segment.
+- **Verge Relocation**: Move signs and props off the asphalt surface to the left or right verge with a single click.
+- **Fine-Grained Lateral Offsets**: Customize prop lateral placement with instant live in-world rendering updates.
+- **Native CS2 UI Integration**: Top-left launcher button and responsive inspector panel.
+- **100% Safe**: Non-destructive prop offset management.
+	</LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="0.1.0" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog>
+### 0.1.0 BETA — Initial Public Test Release
+- Subobject scanning for road edges.
+- Verge relocation and lateral offset controls.
+- Dedicated UI inspector and in-world transform synchronization.
+	</ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

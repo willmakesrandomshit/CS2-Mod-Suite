@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155652" />
+  <DisplayName Value="Event Engine — Stadium &amp; Venue Event Scheduler" />
+  <ShortDescription Value="Beta venue scheduler using game-clock times and bounded native spectator-visit requests." />
+  <LongDescription><![CDATA[BETA — actual attendance and traffic are controlled by vanilla CS2.
+
+WHAT IT DOES
+Discovers venue candidates and schedules bounded native citizen visit requests around a chosen game-clock time.
+
+HOW TO USE
+Open Event Engine, select a venue under Venues, then use Schedule. Choose a target attendance and time and press Schedule Event. The time means its next occurrence today or tomorrow. Overview shows event state; Cancel removes an event.
+
+CURRENT LIMITATIONS
+Arrival requests build during the preceding two game-hours; duration controls event completion. Suggested venue capacities and transport splits are planning estimates, not measured capacity or mode controls. Measured attendance counts dispatched citizens actually observed in the venue. Cancelling removes still-pending matching requests, not trips already consumed by vanilla. Events are runtime-only and clear when leaving the city. Use a test city; the revised full lifecycle still needs in-game verification.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="0.2.1-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[0.2.1-beta.1 — Maintenance beta
+
+Use the selected game-clock time and duration instead of a fixed countdown. Bound unique arrivals, rotate candidate scanning, prevent completed-event resurrection and recycled-entity relinking. Remove fabricated attendance/mode claims and avoid sending unrelated venue occupants home. Fix settings registration.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

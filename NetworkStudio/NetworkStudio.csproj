@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion>0.1.0</InformationalVersion>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" />
+  <ItemGroup>
+    <Analyzer Remove="$(EntityPackagePath)\*.dll" />
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="BuildUI" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="UI" Command="npm run build" Condition="Exists('UI\node_modules')" />
+  </Target>
+  <Target Name="DeployNetworkStudioFiles" AfterTargets="Build">
+    <ItemGroup>
+      <NetworkStudioFiles Include="UI\dist\NetworkStudio.mjs;mod.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NetworkStudioFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="false" />
+    <Delete Files="$(DeployDir)\NetworkStudio_win_x86_64.dll;$(DeployDir)\NetworkStudio_mac_x86_64.bundle;$(DeployDir)\NetworkStudio_linux_x86_64.so" Condition="Exists('$(DeployDir)\NetworkStudio_win_x86_64.dll')" />
+  </Target>
+</Project>

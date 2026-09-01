@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "react": ["../../FastTrack/UI/node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": ["../../FastTrack/UI/node_modules/@types/react/jsx-runtime.d.ts"]
+    },
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["src/**/*", "types/**/*"]
+}

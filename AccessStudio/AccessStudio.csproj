@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Version>0.3.3-alpha.1</Version>
+    <AssemblyVersion>0.3.3.0</AssemblyVersion>
+    <FileVersion>0.3.3.0</FileVersion>
+    <InformationalVersion>0.3.3-alpha.1</InformationalVersion>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" />
+  <ItemGroup>
+    <Analyzer Remove="$(EntityPackagePath)\*.dll" />
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="BuildUI" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="UI" Command="npm run build" />
+  </Target>
+  <Target Name="DeployAccessStudioFiles" AfterTargets="Build">
+    <ItemGroup>
+      <AccessStudioFiles Include="UI\dist\AccessStudio.mjs;UI\mod.json" />
+      <AccessStudioImages Include="UI\dist\images\access-studio.svg" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AccessStudioFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(AccessStudioImages)" DestinationFolder="$(DeployDir)\images" SkipUnchangedFiles="false" />
+  </Target>
+  <Target Name="CleanEmptyBurstOutputs" AfterTargets="DeployWIP;DeployAccessStudioFiles">
+    <!-- The probe contains no Burst jobs. The official toolchain emits 1 KiB, zero-method
+         native containers anyway; do not ship those as if they were functional binaries. -->
+    <Delete Files="$(DeployDir)\AccessStudio_win_x86_64.dll;$(DeployDir)\AccessStudio_mac_x86_64.bundle;$(DeployDir)\AccessStudio_linux_x86_64.so" />
+    <Delete Files="$(DeployDir)\AccessStudio.pdb" />
+  </Target>
+  <ItemGroup>
+    <Reference Update="System"><Private>false</Private></Reference>
+    <Reference Update="System.Core"><Private>false</Private></Reference>
+    <Reference Update="System.Data"><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+  </ItemGroup>
+</Project>

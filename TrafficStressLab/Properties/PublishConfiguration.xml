@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155230" />
+  <DisplayName Value="Traffic Stress Lab" />
+  <ShortDescription Value="Generate additional native road-traffic requests for disposable-city stress testing." />
+  <LongDescription><![CDATA[BETA / EXPERIMENTAL — use a test city.
+
+WHAT IT DOES
+Multiplies native random-road-traffic requests and sustains bounded additional request batches. Extra Trips counts submitted requests, not guaranteed visible vehicles.
+
+HOW TO USE
+Open TSL, choose 2x, 5x, 10x or 25x/Gridlock to start a test. Select 1x or Stop / Reset to stop generation.
+
+CURRENT LIMITATIONS
+Stop/Reset cancels outstanding test-clone requests on the next simulation tick; vehicles already dispatched continue normally. Pause must be released for simulation cleanup to run. Vanilla pathfinding/dispatch determines visible traffic. Higher multipliers can hurt performance and are not fully runtime verified.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.5.5-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.5.5-beta.1 — Maintenance beta
+
+Stop/Reset and 1x now signal cancellation of queued test requests. Honor city-transition reset settings. Harden request counters and per-update queue limits; dispose command buffers reliably.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

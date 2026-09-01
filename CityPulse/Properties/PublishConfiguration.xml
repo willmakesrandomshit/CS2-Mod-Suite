@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155450" />
+  <DisplayName Value="City Pulse — Complete City Diagnostics" />
+  <ShortDescription Value="Read-only city observations from sampled traffic, transit, parking, service, building and network data." />
+  <LongDescription><![CDATA[BETA — observations and heuristics, not proof of a root cause.
+
+WHAT IT DOES
+Samples native city data and highlights warning signs across traffic, transit, parking, services, buildings and network geometry.
+
+HOW TO USE
+Open City Pulse and select a domain tab. Inspect measured evidence and use Show Location to find an observation. Building scans complete in batches.
+
+CURRENT LIMITATIONS
+Health scores and close-spacing warnings are heuristics based on limited samples. They are not a complete diagnosis. There is no automatic road repair or Undo control in this build: the previous lane-curve repair was unsafe and has been removed. Use normal CS2 network tools after checking an observation.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="3.0.4-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[3.0.4-beta.1 — Maintenance beta
+
+Removed fabricated traffic/parking values and unsafe lane-curve Repair/Undo. Use native counters and multiplicative efficiency, fix UI field mismatches, bound building scanning, reset city-specific data and correct settings registration.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

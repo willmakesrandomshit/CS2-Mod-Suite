@@ -1,0 +1,8 @@
+{
+  "id": "RoadRules",
+  "name": "RoadRules",
+  "version": "1.4.5-beta.1",
+  "author": "progamer8785",
+  "description": "Road Rules — Lane & Vehicle Restrictions",
+  "entry": "RoadRules.mjs"
+}

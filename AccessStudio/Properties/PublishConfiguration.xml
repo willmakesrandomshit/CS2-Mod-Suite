@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="156034" />
+  <DisplayName Value="Access Studio" />
+  <ShortDescription Value="Early-alpha manual service access editing. Remote Service Point remains experimental." />
+  <LongDescription><![CDATA[EARLY ALPHA — REMOTE SERVICE POINT IS EXPERIMENTAL.
+
+WHAT IT DOES
+Inspect supported buildings and try an alternate service-access road. Remote mode experiments with a service interaction point on a nearby road while retaining normal frontage.
+
+HOW TO USE
+Open Access Studio, select a building, inspect its current access, choose Move Service Access and select an alternate road. Reset Vanilla restores the captured access state.
+
+CURRENT LIMITATIONS
+Use a disposable test city. Supported buildings and networks vary; vanilla pathfinding still decides actual service routing. Remote mode, service combinations, target-road deletion and save/load behavior do not have complete runtime coverage. Overrides are transient and cleanup is attempted on city transition/unload; this is not a save-safety guarantee.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <Tag Value="Code Mod" />
+  <ModVersion Value="0.3.3-alpha.1" />
+  <GameVersion Value="1.6.*" />
+  <ChangeLog><![CDATA[0.3.3-alpha.1 — Maintenance beta
+
+Added restoration of transient access overrides on city preload and system destruction. Remote access remains early alpha; no new service-routing verification is claimed.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

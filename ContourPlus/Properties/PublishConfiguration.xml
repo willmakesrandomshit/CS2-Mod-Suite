@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155427" />
+  <DisplayName Value="Contour Plus — Topography &amp; Road Grade Analyzer" />
+  <ShortDescription Value="Contour overlays and terrain-planning measurements with configurable intervals." />
+  <LongDescription><![CDATA[BETA — advanced measurements need broader runtime testing.
+
+WHAT IT DOES
+Displays terrain contour lines and terrain/road-grade planning readouts.
+
+HOW TO USE
+Open Contour Plus and enable contours. Adjust available interval and visibility controls in the panel or Options. Disable the overlay to hide the lines.
+
+CURRENT LIMITATIONS
+Contours are off by default. Large height ranges may increase the effective interval to keep overlay work bounded. Terrain sampling and advanced profile/earthwork values are planning aids, not surveying guarantees.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.2.5-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.2.5-beta.1 — Maintenance beta
+
+Connected display settings to the live overlay, persist panel changes, lower redraw frequency and cap segment work. Removed fabricated initial measurements and corrected settings registration.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

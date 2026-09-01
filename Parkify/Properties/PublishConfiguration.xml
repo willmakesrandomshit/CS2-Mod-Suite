@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155651" />
+  <DisplayName Value="Parkify — Pedestrian Path &amp; Park Access Engine" />
+  <ShortDescription Value="Enables parks and recreation buildings to function with pedestrian path connections without requiring vehicle roads." />
+  <LongDescription>
+⚠️ **BETA / PUBLIC TEST BUILD (v0.1.0)**
+
+*Parkify is an experimental pedestrian access engine for city parks and venues.*
+
+---
+
+**Build true pedestrian-first parks.** Parkify allows parks, recreation areas, and leisure venues connected to pedestrian walkways to operate without triggering "No Road Access" notifications while maintaining full visitor routing and service vehicle access.
+
+### Key Features
+- **Pedestrian Park Access**: Parks connected to footpaths and pedestrian lanes operate normally.
+- **Service Integration**: Maintains underlying service delivery and emergency routing bridges.
+- **Real-Time Park Monitoring**: Status dashboard showing all active pedestrian-accessible parks.
+- **Native CS2 UI Integration**: Top-left toolbar button with green nature theme.
+	</LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="0.1.0" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog>
+### 0.1.0 BETA — Initial Public Test Release
+- Pedestrian lane and park connection recognition.
+- Automatic road connection bridging for pedestrian paths.
+- Active status panel and toggle controls.
+	</ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

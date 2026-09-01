@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Version>3.0.4-beta.1</Version>
+    <AssemblyVersion>3.0.4.0</AssemblyVersion>
+    <FileVersion>3.0.4.0</FileVersion>
+    <InformationalVersion>3.0.4-beta.1</InformationalVersion>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" />
+  <ItemGroup>
+    <Analyzer Remove="$(EntityPackagePath)\*.dll" />
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Collections"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="BuildUI" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="UI" Command="npm run build" />
+  </Target>
+  <Target Name="DeployCityPulseFiles" AfterTargets="DeployWIP">
+    <ItemGroup>
+      <CityPulseFiles Include="UI\dist\CityPulse.mjs;UI\mod.json" />
+      <CityPulseIconFiles Include="UI\dist\images\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CityPulseFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(CityPulseIconFiles)" DestinationFiles="@(CityPulseIconFiles->'$(DeployDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CleanEmptyCityPulseBurstOutputs" AfterTargets="DeployWIP;DeployCityPulseFiles">
+    <Delete Files="$(DeployDir)\CityPulse_win_x86_64.dll;$(DeployDir)\CityPulse_mac_x86_64.bundle;$(DeployDir)\CityPulse_linux_x86_64.so;$(DeployDir)\CityPulse.pdb" />
+  </Target>
+  <ItemGroup>
+    <Reference Update="System"><Private>false</Private></Reference>
+    <Reference Update="System.Core"><Private>false</Private></Reference>
+    <Reference Include="System.Data"><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+  </ItemGroup>
+</Project>

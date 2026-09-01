@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155424" />
+  <DisplayName Value="SaveGuard — Non-Destructive Save Protection &amp; Recovery" />
+  <ShortDescription Value="Inspect local save packages and create restore points or separate restored copies. Recovery is not guaranteed." />
+  <LongDescription><![CDATA[BETA — use copies for recovery testing.
+
+WHAT IT DOES
+Lists local saves and restore points and checks basic package readability.
+
+HOW TO USE
+Open SaveGuard, select a save, then create a restore point or use Restore As Copy. A restored copy has a separate filename; Restore As Copy does not overwrite its source.
+
+CURRENT LIMITATIONS
+A readable archive is not proof CS2 can load it. The recovery check reads archive entries; only loading the restored copy verifies recovery. Retention removes older restore points after a new copy succeeds. SaveGuard cannot guarantee recovery from missing mods, incompatible saves or damaged data. Keep independent backups.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.2.4-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.2.4-beta.1 — Maintenance beta
+
+Create the new restore point before pruning older ones. Preserve original filenames and avoid destination collisions. Fixed missing selection handling and corrected archive-health wording and settings registration.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

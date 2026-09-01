@@ -1,0 +1,8 @@
+{
+  "id": "EventEngine",
+  "name": "EventEngine",
+  "version": "0.2.1-beta.1",
+  "author": "progamer8785",
+  "description": "Event Engine — Stadium, Arena & Venue Event Scheduler",
+  "entry": "EventEngine.mjs"
+}

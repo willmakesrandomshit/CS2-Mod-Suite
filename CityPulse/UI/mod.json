@@ -1,0 +1,8 @@
+{
+  "id": "CityPulse",
+  "name": "City Pulse",
+  "version": "3.0.4-beta.1",
+  "author": "progamer8785",
+  "description": "Ranked city diagnostics for traffic, transit, parking, services, buildings and road networks.",
+  "scripts": ["CityPulse.mjs"]
+}

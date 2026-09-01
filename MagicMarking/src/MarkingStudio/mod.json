@@ -1,0 +1,10 @@
+{
+  "id": "MarkingStudio",
+  "author": "progamer8785",
+  "version": "2.4.1-beta.1",
+  "dependencies": [
+    "97828",
+    "98624",
+    "99062"
+  ]
+}

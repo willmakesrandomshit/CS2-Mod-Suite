@@ -1,0 +1,267 @@
+// Custom dropdown built on divs (no <select>). Native <select> crashes cohtml
+// with a non-actionable runtime error. Native CS2 Dropdown from cs2/ui works
+// but has its own padding/typography that didn't match our compact panel.
+//
+// Why the menu is portalled to document.body instead of rendered next to the
+// toggle: the toggle lives inside Panel (overflow-y: auto) and LineRowOuter
+// (overflow: hidden, for the accordion clip). An absolute-positioned menu
+// inside either gets clipped — so we render the menu at the document root
+// and compute its viewport-relative top/left from the toggle's bounding box.
+//
+// COHTML-safe checklist (see TTE's dropdown.tsx for the reference build):
+//   - No transient props ($foo) — passes static styles + inline style for the
+//     few values that depend on state. cohtml's styled-components integration
+//     mis-resolves transient props occasionally.
+//   - No transform on hover.
+//   - click event (not mousedown) for the outside-click handler.
+//   - Arrow as unicode glyph ▼/▲ — these two specifically render fine in
+//     cohtml (unlike chevron arrows and many other symbols).
+
+import { ReactNode, useState, useRef, useEffect, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
+import { styled } from "../styles/styled";
+import { tokens as T } from "../styles/tokens";
+
+export interface DropdownOption<V> {
+  value: V;
+  label: string;
+  /** Optional visual sample rendered before the label (style swatches etc). */
+  preview?: ReactNode;
+  /** Pinned favourite — filled pin icon; callers sort pinned options first. */
+  pinned?: boolean;
+}
+
+export interface DropdownProps<V> {
+  value: V;
+  options: DropdownOption<V>[];
+  onChange: (next: V) => void;
+  placeholder?: string;
+  /** Fires on menu open/close. Popover hosts need it: the menu is portalled to
+   *  document.body, so the cursor travelling into it leaves the host element —
+   *  without this signal a hover-expanded popover collapses and unmounts the
+   *  dropdown mid-interaction. */
+  onOpenChange?: (open: boolean) => void;
+  /** When set, every menu item grows a trailing pin button that toggles the
+   *  option's favourite status. Clicking the pin does NOT select the option or
+   *  close the menu — the list just re-sorts on the next binding push. */
+  onTogglePin?: (v: V) => void;
+}
+
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  font-size: ${T.fontSizeMd};
+`;
+
+const Toggle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${T.space1} ${T.space2};
+  background: rgba(8, 12, 18, 0.75);
+  color: ${T.colorTextPrimary};
+  border: 1rem solid ${T.colorBorderMid};
+  border-radius: ${T.radiusSm};
+  cursor: pointer;
+  user-select: none;
+  transition: background ${T.transitionFast}, border-color ${T.transitionFast};
+
+  &:hover {
+    background: rgba(8, 12, 18, 0.95);
+    border-color: ${T.colorBorderStrong};
+  }
+`;
+
+const Label = styled.span`
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const Arrow = styled.span`
+  font-size: 9rem;
+  color: ${T.colorTextMuted};
+  margin-left: ${T.space2};
+`;
+
+// Portal-mounted floater. Positioning is computed in JS from the toggle's
+// bounding box so it sits flush under the toggle regardless of panel scroll
+// or accordion overflow clipping.
+// Solid (not glass) — the menu floats OVER the panel, and a translucent
+// blurred surface there smears the covered controls into colour blotches.
+const Menu = styled.div`
+  position: fixed;
+  background: ${T.colorSurfaceSolid};
+  border: 1rem solid ${T.colorBorderMid};
+  border-radius: ${T.radiusSm};
+  box-shadow: ${T.shadowMd};
+  z-index: 999999;
+  max-height: 240rem;
+  overflow-y: auto;
+  font-size: ${T.fontSizeMd};
+`;
+
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  padding: ${T.space1} ${T.space2};
+  color: ${T.colorTextPrimary};
+  cursor: pointer;
+  user-select: none;
+  transition: background ${T.transitionFast};
+
+  &:hover {
+    background: ${T.colorRowBgHover};
+  }
+`;
+
+// Menu item label: nowrap defines the menu's shrink-wrap width; ellipsis only
+// kicks in when the screen-edge maxWidth clips the menu — the pin never clips.
+const ItemLabel = styled.span`
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+// Swatch slot before the label (toggle + menu items). flex-shrink 0 so the
+// ellipsized label never squeezes the sample.
+const Preview = styled.span`
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: ${T.space2};
+`;
+
+// Trailing pin toggle on menu items. A padded hit target noticeably larger than
+// the 12px glyph — dropdown rows are dense and the pin competes with "select".
+const PinBtn = styled.span`
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 2rem 2rem 2rem ${T.space2};
+  border-radius: ${T.radiusSm};
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+`;
+
+// Inline SVG pin (star) — unicode glyph coverage in cohtml is unreliable, SVG
+// is not. Filled amber = pinned, faint outline = not.
+const PinIcon = ({ active }: { active: boolean }) => (
+  <svg width={12} height={12} viewBox="0 0 12 12" fill="none">
+    <path
+      d="M6 1 L7.4 4.2 L10.9 4.5 L8.2 6.8 L9 10.2 L6 8.4 L3 10.2 L3.8 6.8 L1.1 4.5 L4.6 4.2 Z"
+      fill={active ? "#f2c94c" : "none"}
+      stroke={active ? "#f2c94c" : "rgba(255, 255, 255, 0.4)"}
+      strokeWidth={1}
+    />
+  </svg>
+);
+
+const itemSelectedStyle = {
+  background: T.colorAccentDim,
+  color: T.colorTextPrimary,
+};
+
+export const Dropdown = <V,>({ value, options, onChange, placeholder = "—", onOpenChange, onTogglePin }: DropdownProps<V>) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const setOpen = (next: boolean) => {
+    setIsOpen(next);
+    onOpenChange?.(next);
+  };
+  const [menuRect, setMenuRect] = useState<{ top: number; left: number; width: number; maxWidth: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
+
+  // Measure the toggle position whenever the menu opens. useLayoutEffect runs
+  // before paint, so the menu appears at the right spot without a flicker.
+  useLayoutEffect(() => {
+    if (!isOpen || !toggleRef.current) return;
+    const rect = toggleRef.current.getBoundingClientRect();
+    setMenuRect({
+      top: rect.bottom + 2,
+      left: rect.left,
+      width: rect.width,
+      // Let the menu outgrow the toggle for long labels, but never past the
+      // right screen edge (popovers can sit close to it).
+      maxWidth: Math.max(rect.width, window.innerWidth - rect.left - 8),
+    });
+  }, [isOpen]);
+
+  // Close on click outside. Uses `click` (not `mousedown`) — cohtml fires
+  // mousedown unreliably for certain element types, click is consistent.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      // The menu is portalled, so it's not inside containerRef — check both.
+      if (containerRef.current?.contains(target)) return;
+      // Walk up looking for our menu (tag it via data attribute).
+      let n: Node | null = target;
+      while (n) {
+        if ((n as HTMLElement).dataset?.trlDropdownMenu === "1") return;
+        n = (n as HTMLElement).parentNode;
+      }
+      setOpen(false);
+    };
+    // Defer attach so the click that opened the menu doesn't immediately close it.
+    const id = window.setTimeout(() => document.addEventListener("click", handler), 0);
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener("click", handler);
+    };
+  }, [isOpen]);
+
+  const selected = options.find((o) => o.value === value);
+
+  const handleSelect = (v: V) => {
+    onChange(v);
+    setOpen(false);
+  };
+
+  return (
+    <Container ref={containerRef}>
+      <Toggle ref={toggleRef} onClick={() => setOpen(!isOpen)}>
+        {selected?.preview && <Preview>{selected.preview}</Preview>}
+        <Label>{selected ? selected.label : placeholder}</Label>
+        <Arrow>{isOpen ? "▲" : "▼"}</Arrow>
+      </Toggle>
+      {isOpen && menuRect &&
+        createPortal(
+          <Menu
+            data-trl-dropdown-menu="1"
+            // min-width = toggle width so short lists still align with the
+            // control; no fixed width — the fixed-position menu shrink-wraps
+            // to its widest item, so long labels and the pin button always fit.
+            style={{ top: menuRect.top, left: menuRect.left, minWidth: menuRect.width, maxWidth: menuRect.maxWidth }}
+          >
+            {options.map((opt, idx) => (
+              <Item
+                key={idx}
+                style={opt.value === value ? itemSelectedStyle : undefined}
+                onClick={() => handleSelect(opt.value)}
+              >
+                {opt.preview && <Preview>{opt.preview}</Preview>}
+                <ItemLabel>{opt.label}</ItemLabel>
+                {onTogglePin && (
+                  <PinBtn
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onTogglePin(opt.value);
+                    }}
+                  >
+                    <PinIcon active={!!opt.pinned} />
+                  </PinBtn>
+                )}
+              </Item>
+            ))}
+          </Menu>,
+          document.body,
+        )}
+    </Container>
+  );
+};

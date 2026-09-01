@@ -1,0 +1,23 @@
+This repository is an aggregate of separately licensed projects.
+
+MIT License
+-----------
+
+Unless a project folder says otherwise, original source in the following
+folders is licensed under the MIT License in LICENSES/MIT.txt:
+
+AccessStudio, CityPulse, ContourPlus, CrashLens, DiscordRPC, EventEngine,
+FastTrack, NetworkStudio, Parkify, RoadRules, SaveGuard and TrafficStressLab.
+
+GPL-3.0 License
+---------------
+
+MagicMarking is a modified fork of Town Road Lane and is licensed under
+GPL-3.0. JunctionStudio interoperates directly with Town Road Lane data and is
+conservatively distributed under GPL-3.0. See LICENSES/GPL-3.0.txt and the
+notices in those project folders.
+
+Third-party code and dependencies retain their own licences. See
+THIRD_PARTY_NOTICES.md. Cities: Skylines II game assemblies, the official
+modding toolchain and third-party dependency binaries are not included or
+relicensed by this repository.

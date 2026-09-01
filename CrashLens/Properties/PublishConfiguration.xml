@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155239" />
+  <DisplayName Value="CrashLens" />
+  <ShortDescription Value="Collect local error evidence and export a support report. Suspect rankings are not proof of fault." />
+  <LongDescription><![CDATA[BETA — log evidence is not a definitive crash diagnosis.
+
+WHAT IT DOES
+Scans available local logs and presents errors, context and possible suspects.
+
+HOW TO USE
+Open CrashLens, rescan, inspect an entry and export a support report when needed. Reports are saved under ModsData/CrashLens.
+
+CURRENT LIMITATIONS
+No evidence found does not mean every mod is healthy. Suspect ranking cannot prove which mod caused an error. Reports are not uploaded automatically. User-profile paths are redacted, but inspect all reports and screenshots for private data before posting.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.1.4-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.1.4-beta.1 — Maintenance beta
+
+Reset monitoring state cleanly on reinitialization and auto-open state per city. Strengthen case-insensitive profile-path redaction, replace misleading healthy/causality claims and correct settings registration.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

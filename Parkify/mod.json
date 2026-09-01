@@ -1,0 +1,8 @@
+{
+  "id": "Parkify",
+  "name": "Parkify",
+  "version": "0.1.0",
+  "author": "progamer8785",
+  "description": "Parkify — Pedestrian Path & Park Access Engine",
+  "entry": "Parkify.mjs"
+}

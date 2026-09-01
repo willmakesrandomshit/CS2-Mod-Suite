@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Version>1.2.4-beta.1</Version>
+    <AssemblyVersion>1.2.4.0</AssemblyVersion>
+    <FileVersion>1.2.4.0</FileVersion>
+    <InformationalVersion>1.2.4-beta.1</InformationalVersion>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" />
+  <ItemGroup>
+    <Analyzer Remove="$(EntityPackagePath)\*.dll" />
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="System.IO.Compression"><Private>false</Private></Reference>
+    <Reference Include="System.IO.Compression.FileSystem"><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="BuildUI" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="UI" Command="npm run build" />
+  </Target>
+  <Target Name="DeploySaveGuardFiles" AfterTargets="DeployWIP">
+    <ItemGroup>
+      <SaveGuardFiles Include="UI\dist\SaveGuard.mjs;UI\mod.json" />
+      <SaveGuardIconFiles Include="UI\dist\images\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SaveGuardFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SaveGuardIconFiles)" DestinationFiles="@(SaveGuardIconFiles->'$(DeployDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CleanEmptySaveGuardBurstOutputs" AfterTargets="DeployWIP;DeploySaveGuardFiles">
+    <Delete Files="$(DeployDir)\SaveGuard_win_x86_64.dll;$(DeployDir)\SaveGuard_mac_x86_64.bundle;$(DeployDir)\SaveGuard_linux_x86_64.so;$(DeployDir)\SaveGuard.pdb" />
+  </Target>
+  <ItemGroup>
+    <Reference Update="System"><Private>false</Private></Reference>
+    <Reference Update="System.Core"><Private>false</Private></Reference>
+    <Reference Update="System.Data"><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+  </ItemGroup>
+</Project>

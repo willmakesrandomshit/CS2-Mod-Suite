@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155242" />
+  <DisplayName Value="Junction Studio — Town Road Lane Extension" />
+  <ShortDescription Value="Beta junction editing and preset workflows using Town Road Lane data." />
+  <LongDescription><![CDATA[BETA — requires the supported Town Road Lane selection/data workflow.
+
+WHAT IT DOES
+Inspects compatible junctions and applies saved marking/preset data to their supported topology.
+
+HOW TO USE
+Select a supported junction, make edits, then save/apply a preset or reset the selected junction. Presets must match the target junction's supported approach structure.
+
+CURRENT LIMITATIONS
+Selection depends on Town Road Lane. Invalid presets are rejected before mutation; rollback is attempted if applying a valid preset fails. This is not a guarantee across all junction/topology combinations. Full copy/paste, redraw, save/load and teardown testing is still pending.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.1.4-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <Dependency Id="150863" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.1.4-beta.1 — Maintenance beta
+
+Validate preset sizes, finite coordinates and references before clearing existing data. Capture rollback state, cap imported libraries and fix area-redo indexing and city-transition UI state.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

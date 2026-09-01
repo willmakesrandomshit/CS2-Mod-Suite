@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155247" />
+  <DisplayName Value="Magic Marking" />
+  <ShortDescription Value="Beta road and junction marking tools with line/fill editing and native secondary-lane integration." />
+  <LongDescription><![CDATA[BETA — road and junction marking tools.
+
+WHAT IT DOES
+Creates and edits supported road/junction lines and area fills, including snapping and style controls.
+
+HOW TO USE
+Open Magic Marking from its toolbar button or configured shortcut, select a road/junction and use the line or fill tools. Use the panel's delete/reset controls for the selected markings.
+
+CURRENT LIMITATIONS
+Complex topology and third-party road styles need broader testing. Some styles require their listed dependencies. This mod replaces the native secondary-marking generator; simultaneous use with another replacement marking engine is not guaranteed compatible. Keep backups before extensive editing.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="2.4.1-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <Dependency Id="97828" />
+  <Dependency Id="98624" />
+  <Dependency Id="99062" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[2.4.1-beta.1 — Maintenance beta
+
+Stop registering development prefab/mesh probes in player builds. Restore the captured native marking-system enable state on unload. Cancel obsolete surface-initialization callbacks and keep version/manifest metadata consistent.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

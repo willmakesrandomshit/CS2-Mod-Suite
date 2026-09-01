@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release</Configurations>
+		<CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+	
+		<!--The file where mod information which is required for publishing mod on PDX mods are stored-->
+		<PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+		<Version>1.5.5-beta.1</Version>
+		<AssemblyVersion>1.5.5.0</AssemblyVersion>
+		<FileVersion>1.5.5.0</FileVersion>
+		<InformationalVersion>1.5.5-beta.1</InformationalVersion>
+	</PropertyGroup>
+	
+	<!--Imports must be after PropertyGroup block-->
+	<Import Project="$(CS2ToolPath)\Mod.props" />
+	<Import Project="$(CS2ToolPath)\Mod.targets" />
+
+	<ItemGroup>
+		<!-- This system uses the classic EntityManager API and requires no ECS source generators. -->
+		<Analyzer Remove="$(EntityPackagePath)\*.dll" />
+		<Reference Include="Game">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Core">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Logging">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+		<Reference Include="Colossal.UI.Binding">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Colossal.IO.AssetDatabase">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Burst">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Collections">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Entities">
+			<Private>false</Private>
+		</Reference>
+		<Reference Include="Unity.Mathematics">
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Update="System">
+			<Private>false</Private>
+		</Reference>
+		<Reference Update="System.Core">
+			<Private>false</Private>
+		</Reference>
+		<Reference Update="System.Data">
+			<Private>false</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+		<None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+	</ItemGroup>
+
+	<Target Name="BuildUI" BeforeTargets="BeforeBuild">
+		<Exec WorkingDirectory="UI" Command="npm run build" />
+	</Target>
+
+	<Target Name="DeployUI" AfterTargets="DeployWIP" Condition="'$(NeedBuild)' == 'true' AND '$(DeployDir)' != ''">
+		<ItemGroup>
+			<UIFiles Include="UI\dist\TrafficStressTester.mjs;UI\dist\TrafficStressTester.mjs.LICENSE.txt" />
+			<UIImages Include="UI\dist\images\**\*.*" />
+		</ItemGroup>
+		<Copy SourceFiles="@(UIFiles)" DestinationFolder="$(DeployDir)" />
+		<Copy SourceFiles="UI\mod.json" DestinationFolder="$(DeployDir)" />
+		<Copy SourceFiles="@(UIImages)" DestinationFiles="@(UIImages->'$(DeployDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
+	<Target Name="CleanEmptyTrafficStressBurstOutputs" AfterTargets="DeployWIP;DeployUI">
+		<Delete Files="$(DeployDir)\TrafficStressTester_win_x86_64.dll;$(DeployDir)\TrafficStressTester_mac_x86_64.bundle;$(DeployDir)\TrafficStressTester_linux_x86_64.so;$(DeployDir)\TrafficStressTester.pdb" />
+	</Target>
+
+</Project>

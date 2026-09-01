@@ -1,0 +1,42 @@
+.as-panel {
+  position: absolute;
+  top: 86px;
+  right: 22px;
+  width: 430px;
+  max-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  color: #e8f0f5;
+  background: rgba(12, 22, 30, .96);
+  border: 1px solid rgba(94, 201, 235, .34);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .48);
+  z-index: 1000;
+  font-family: "Segoe UI", sans-serif;
+
+  header { display: flex; align-items: flex-start; justify-content: space-between; }
+  header strong { display: block; font-size: 18px; }
+  header small { display: block; margin-top: 2px; color: #79cce8; font-size: 10px; letter-spacing: .12em; }
+  header button { border: 0; background: transparent; color: #b8c6ce; font-size: 22px; cursor: pointer; }
+  .as-state { padding: 7px 10px; border-radius: 4px; background: #495661; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+  .as-state.active { background: #167f9f; }
+  .as-poc-state { padding: 7px 10px; border-radius: 4px; background: #495661; color: #eefaff; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+  .as-poc-state.armed { background: #a66a13; }
+  .as-poc-state.custom { background: #147f55; }
+  .as-status { margin: 0; color: #cbd8de; font-size: 13px; line-height: 1.35; }
+  .as-actions { display: flex; gap: 7px; }
+  .as-actions button { flex: 1; padding: 8px; border: 1px solid #3f6573; border-radius: 4px; background: #183846; color: #eefaff; cursor: pointer; }
+  .as-actions button[disabled] { opacity: .38; cursor: default; }
+  .as-poc-actions { flex-wrap: wrap; }
+  .as-poc-actions button { min-width: 120px; }
+  .as-poc-actions button:first-child { flex-grow: 2; }
+  .as-poc-actions button.experimental { border-color: #b47a26; background: #493616; }
+  .as-poc-actions button small { display: block; margin-top: 2px; color: #f3c878; font-size: 8px; letter-spacing: .08em; }
+  .as-advanced-toggle { align-self: flex-start; border: 0; background: transparent; color: #9fc6d4; cursor: pointer; font-size: 11px; }
+  .as-advanced { display: flex; flex-direction: column; gap: 8px; min-height: 0; overflow: auto; }
+  .as-telemetry { min-height: 125px; color: #d9f4de; }
+  pre { margin: 0; min-height: 180px; overflow: auto; padding: 10px; border-radius: 5px; background: #081117; color: #c7e9f5; font: 11px/1.45 Consolas, monospace; white-space: pre-wrap; }
+  footer { color: #78909b; font-size: 10px; }
+}

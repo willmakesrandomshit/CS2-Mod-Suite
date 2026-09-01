@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Publish>
+  <ModId Value="155436" />
+  <DisplayName Value="Road Rules — Lane &amp; Vehicle Restrictions" />
+  <ShortDescription Value="Beta physical-lane rules with native public-lane access, soft traffic preferences and closures." />
+  <LongDescription><![CDATA[BETA — selective routing behavior remains partially verified.
+
+WHAT IT DOES
+Edit rules for physical lanes of a selected carriageway. Internal routing representations are grouped by lateral cross-section position, not simply counted as lanes.
+
+HOW TO USE
+Open Road Rules, select a road/carriageway, select a physical lane, then choose a supported preset. Reset Lane restores its captured defaults.
+
+CURRENT LIMITATIONS
+Public/Service Lane uses CS2's shared public-lane category; it is not bus-only. No Heavy Traffic and Local Bias are native soft preferences, not absolute bans. Close Lane/Close Road request closures, but existing routes can take time to clear. Observe newly routed traffic rather than assuming all existing vehicles disappear. The exact two-lane highlight and class-enforcement runtime matrix is not complete. No claim is made that Skyve has cleared its warning. Test in a disposable city.]]></LongDescription>
+  <Thumbnail Value="Properties/Thumbnail.png" />
+  <ModVersion Value="1.4.5-beta.1" />
+  <GameVersion Value="1.6.*" />
+  <RequiredDLC Value="" />
+  <ChangeLog><![CDATA[1.4.5-beta.1 — Maintenance beta
+
+Fixed lanes remaining closed after Reopen, restored custom speed on Reset Lane, and prevented unsupported presets from changing the displayed rule. Corrected settings registration and removed repeated per-owner city-wide repath scans.
+
+Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+  <AccessLevel Value="Public" />
+</Publish>

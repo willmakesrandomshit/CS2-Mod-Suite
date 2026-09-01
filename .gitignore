@@ -1,0 +1,66 @@
+# IDE and local settings
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+
+# .NET and CS2 toolchain output
+**/bin/
+**/obj/
+**/Build/
+artifacts/
+**/Temp/
+**/Library/
+*.pdb
+*.dll
+*.exe
+*.so
+*.bundle
+
+# Frontend dependencies and output
+**/node_modules/
+**/dist/
+*.mjs
+*.mjs.LICENSE.txt
+*.cache
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+**/secrets/
+**/credentials/
+*credential*
+*.key
+*.pem
+*.pfx
+appsettings.*.json
+
+# Runtime/user data
+**/logs/
+**/Logs/
+**/backups/
+**/Backups/
+**/ModsData/
+*.log
+*.dmp
+*.crash
+*.tmp
+*.bak
+*.zip
+*.7z
+*.cok
+*.cok.cid
+*.save
+
+# Local publishing/authentication state
+PDXAccountData*
+*auth*.json
+*session*.json
+Properties/Screenshots/
+
+# OS noise
+Thumbs.db
+.DS_Store

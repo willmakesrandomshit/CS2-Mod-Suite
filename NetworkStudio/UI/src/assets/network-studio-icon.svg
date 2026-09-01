@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- Road Edge line -->
+  <path d="M4 20L10 4" stroke="#64748B" stroke-width="2" stroke-linecap="round" />
+  <path d="M14 20L20 4" stroke="#64748B" stroke-width="2" stroke-linecap="round" />
+  <!-- Verge Sign Pole and Diamond -->
+  <path d="M5 19V11" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" />
+  <polygon points="5,7 8,10 5,13 2,10" fill="#38BDF8" stroke="#38BDF8" stroke-width="1.5" stroke-linejoin="round" />
+  <!-- Street Light Arc on right -->
+  <path d="M19 19V6C19 4 16 4 15 5" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" />
+  <circle cx="15" cy="6" r="1.5" fill="#FBBF24" />
+</svg>

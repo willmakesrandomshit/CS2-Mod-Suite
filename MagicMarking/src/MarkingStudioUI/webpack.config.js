@@ -1,0 +1,100 @@
+const path = require("path");
+const MOD = require("./mod.json");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CSSPresencePlugin } = require("./tools/css-presence");
+const TerserPlugin = require("terser-webpack-plugin");
+const gray = (text) => `\x1b[90m${text}\x1b[0m`;
+
+// Output to a local dist/ folder inside the UI project. The C# csproj's BuildFrontend target
+// (mirrors the TTE pattern: TLEFrontend → TrafficToolEssentials build pipeline) picks up
+// dist/*.mjs + dist/*.css + mod.json and copies them into its own OutDir, which Mod.targets
+// then mirrors into $(LocalModsPath)\MarkingStudio\.
+//
+// Earlier this script emitted straight into Mods/MarkingStudio/, but the C# Mod.targets does
+// <RemoveDir $(DeployDir)> on every build and wiped the .mjs that we'd just placed there —
+// the UI went silently missing after every C# rebuild.
+const OUTPUT_DIR = "./dist/";
+// The banner is the manifest: the game's UIModuleAsset.PostCreate parses this
+// comment block out of the .mjs itself (NOT mod.json). The Dependencies line
+// is REQUIRED even when empty — PostCreate calls AddTags(m_UIModuleDependencies)
+// unconditionally, and that field stays null (→ NullReferenceException in the
+// game log on every startup) unless a "Dependencies:" line was parsed.
+const banner = `\n * Cities: Skylines II UI Module\n * Id: ${MOD.id}\n * Author: ${MOD.author}\n * Version: ${MOD.version.split('-')[0]}\n * Dependencies: ${(MOD.dependencies || []).join(", ")}\n`;
+
+module.exports = {
+  // cohtml's JS runtime doesn't expose readable stack traces — every error
+  // points at "JS :15:23" regardless of mode, so dev mode buys us nothing.
+  // Keep production for the size + speed.
+  mode: "production",
+  stats: "none",
+  entry: { [MOD.id]: "./src/index.tsx" },
+  externalsType: "window",
+  externals: {
+    react: "React",
+    "react-dom": "ReactDOM",
+    "react-dom/client": "ReactDOM",
+    "cs2/modding": "cs2/modding",
+    "cs2/api": "cs2/api",
+    "cs2/bindings": "cs2/bindings",
+    "cs2/l10n": "cs2/l10n",
+    "cs2/ui": "cs2/ui",
+    "cs2/input": "cs2/input",
+    "cs2/utils": "cs2/utils",
+    "cohtml/cohtml": "cohtml/cohtml",
+  },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
+      {
+        test: /\.s?css$/,
+        include: path.join(__dirname, "src"),
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              url: true,
+              importLoaders: 1,
+              modules: {
+                auto: (resourcePath) => !resourcePath.endsWith("index.scss"),
+                exportLocalsConvention: "camelCase",
+                localIdentName: "[local]_[hash:base64:3]",
+              },
+            },
+          },
+          { loader: "sass-loader", options: { api: "modern" } },
+        ],
+      },
+      { test: /\.(png|jpe?g|gif|svg)$/i, type: "asset/resource", generator: { filename: "images/[name][ext][query]" } },
+    ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+    modules: ["node_modules", path.join(__dirname, "src")],
+    alias: { "mod.json": path.resolve(__dirname, "mod.json") },
+  },
+  output: {
+    path: path.resolve(__dirname, OUTPUT_DIR),
+    library: { type: "module" },
+    publicPath: `coui://ui-mods/`,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({ extractComments: { banner: () => banner } })],
+  },
+  experiments: { outputModule: true },
+  plugins: [
+    new MiniCssExtractPlugin(),
+    new CSSPresencePlugin(),
+    {
+      apply(compiler) {
+        let runCount = 0;
+        compiler.hooks.done.tap("AfterDonePlugin", (stats) => {
+          console.log(stats.toString({ colors: true }));
+          console.log(`\n🔨 ${!runCount++ ? "Built" : "Updated"} ${MOD.id}`);
+          console.log("   " + gray(OUTPUT_DIR) + "\n");
+        });
+      },
+    },
+  ],
+};

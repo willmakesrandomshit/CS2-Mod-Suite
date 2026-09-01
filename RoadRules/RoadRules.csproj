@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$(CSII_TOOLPATH)</CS2ToolPath>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <Version>1.4.5-beta.1</Version>
+    <AssemblyVersion>1.4.5.0</AssemblyVersion>
+    <FileVersion>1.4.5.0</FileVersion>
+    <InformationalVersion>1.4.5-beta.1</InformationalVersion>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" />
+  <ItemGroup>
+    <Analyzer Remove="$(EntityPackagePath)\*.dll" />
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="System.IO.Compression"><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="BuildUI" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="UI" Command="npm run build" />
+  </Target>
+  <Target Name="DeployRoadRulesFiles" AfterTargets="Build">
+    <ItemGroup>
+      <RoadRulesFiles Include="UI\dist\RoadRules.mjs;UI\mod.json" />
+      <RoadRulesImages Include="UI\dist\images\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RoadRulesFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="false" />
+    <Copy SourceFiles="@(RoadRulesImages)" DestinationFiles="@(RoadRulesImages->'$(DeployDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false" />
+    <Delete Files="$(DeployDir)\RoadRules_win_x86_64.dll;$(DeployDir)\RoadRules_mac_x86_64.bundle;$(DeployDir)\RoadRules_linux_x86_64.so" Condition="Exists('$(DeployDir)\RoadRules_win_x86_64.dll')" />
+  </Target>
+  <Target Name="RemoveEmptyBurstPlaceholders" AfterTargets="DeployRoadRulesFiles">
+    <Delete Files="$(TargetDir)RoadRules_win_x86_64.dll;$(TargetDir)RoadRules_mac_x86_64.bundle;$(TargetDir)RoadRules_linux_x86_64.so;$(TargetDir)Temp\RoadRules_win_x86_64.dll;$(TargetDir)Temp\RoadRules_mac_x86_64.bundle;$(TargetDir)Temp\RoadRules_linux_x86_64.so" />
+  </Target>
+  <ItemGroup>
+    <Reference Update="System"><Private>false</Private></Reference>
+    <Reference Update="System.Core"><Private>false</Private></Reference>
+    <Reference Update="System.Data"><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(ModPropsFile)" Link="Properties\Mod.props" />
+    <None Include="$(ModTargetsFile)" Link="Properties\Mod.targets" />
+  </ItemGroup>
+</Project>
