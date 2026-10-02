@@ -94,7 +94,13 @@ namespace MarkingStudio.Diagnostics
                 && _world != null && _world.IsCreated;
             if (!gateOpen)
             {
-                if (++_gateFrames >= kGateWarnFrames && !_gateWarned)
+                // Do not report missing clones while CSII is still booting. Heavy playsets
+                // can spend longer than a minute in BootingPrefabs, but the live main-menu
+                // gate may open later in that same launch (as observed on 1.6.2f1).
+                bool runtimeReady = gm != null && gm.modManager.isInitialized
+                    && (gm.gameMode == GameMode.MainMenu || gm.gameMode == GameMode.Game)
+                    && gm.state != GameManager.State.Booting && gm.state != GameManager.State.Loading;
+                if (runtimeReady && ++_gateFrames >= kGateWarnFrames && !_gateWarned)
                 {
                     _gateWarned = true;
                     log.Warn($"[late-clone] gate not passed after {kGateWarnFrames} frames (gameMode={gm?.gameMode.ToString() ?? "<no GameManager>"}, state={gm?.state.ToString() ?? "-"}) — surface clones missing, clone-backed fill styles will fall back to concrete");
