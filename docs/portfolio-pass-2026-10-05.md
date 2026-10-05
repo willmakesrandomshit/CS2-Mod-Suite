@@ -28,7 +28,7 @@ products. Source versions are not claims about published packages.
 | Lane Doctor | Standalone local source | Repair-preview guide; hides score without scanned segments |
 | Parking Pulse | Standalone local source | Facility occupancy guide; hides score without observed facilities |
 | Service Doctor | Standalone local source | Facility evidence guide; hides scores without observed facilities |
-| Traffic Pulse | Standalone local source | Replaces fixed speed with bounded road-flow sampling; removes invented density/propagation evidence |
+| Traffic Pulse | Standalone local source | Replaces fixed speed with bounded vehicle-velocity sampling; removes invented density/propagation evidence |
 | Transit Pulse | Standalone local source | Line/stop guide; hides score without observed lines |
 | Lot Studio | Separate private repository | Localized guide, remembered drawers, support snapshot, accessible header Exit, styled inputs |
 | CityMCP | Separate source repository | Dismissible pairing guide, Escape close, title-only dragging, safe status copy |
@@ -72,11 +72,22 @@ replacement. Unsupported marking approaches now fail capture instead of silently
 dropping lines. The preview is a summary, not a world-space overlay.
 
 Traffic Pulse previously initialized live speed to 46.2 km/h and never updated it.
-It now computes duration-weighted speed from available flow data on at most 120
-road segments. Unavailable stopped ratios, speed limits and per-segment vehicle
-counts are labelled unavailable; connected roads are not called upstream/downstream
+It now samples actual Moving.m_Velocity on at most 160 road vehicles through
+read-only archetype chunks. The installed game's DeveloperInfoUISystem confirms
+velocity magnitude times 3.6 yields km/h. Zero-speed samples are retained;
+non-finite/overflow measurements are rejected. The sampled global stopped ratio
+is measured below 1 km/h. Per-segment stopped ratios, speed limits and vehicle
+counts are unavailable; connected roads are not called upstream/downstream
 without direction evidence. Congestion, queue pressure and suggested causes remain
 explicit heuristics. City preload clears observations, selection and snapshots.
+
+A final installed-assembly check caught an incorrect proposed road-flow speed
+conversion before deployment. Game.Net.NetUtils.GetTrafficFlowSpeed saturates a
+normalized distance/duration ratio, and RoadSection displays it as a percentage.
+Traffic Pulse now labels that signal flow efficiency rather than km/h. The
+corrected velocity helper passes seven pure checks; Debug/Release/UI rebuilt with
+zero warnings/errors. Native sampling and traffic observations remain runtime
+unverified. The standalone source archive was refreshed with the correction.
 
 ## Evidence and remaining gate
 
