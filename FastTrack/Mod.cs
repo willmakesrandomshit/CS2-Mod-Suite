@@ -14,17 +14,18 @@ namespace FastTrack
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            Log.Info("FastTrack v1.3.5-beta.1 loaded | release candidate | vanilla visual contract");
+            Log.Info("FastTrack v1.3.5-beta.2 loaded | opt-in adaptive LOD prototype");
             var defaults = new FastTrackSetting(this);
             Settings = new FastTrackSetting(this);
             Settings.RegisterInOptionsUI();
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(Settings));
             AssetDatabase.global.LoadSettings(nameof(FastTrack), Settings, defaults);
-            bool migrated = Settings.EnforceVisualContract();
+            bool migrated = Settings.MigrateLegacySettings();
             FastTrackRuntime.Initialize();
             if (migrated) Settings.ApplyAndSave();
 
-            // Read-only camera classification used for diagnostics only.
+            // Camera classification drives the optional native LOD adjustment.
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<CameraAwarenessSystem>(SystemUpdatePhase.Rendering);
 
             // Safe loading-only optimization. No renderer/LOD systems are modified.
@@ -33,7 +34,7 @@ namespace FastTrack
             // Read-only performance signal collection.
             updateSystem.UpdateAt<PerformanceProfilerSystem>(SystemUpdatePhase.Rendering);
 
-            // Legacy-named read-only FPS monitor and visual-contract telemetry.
+            // FPS telemetry remains diagnostic; it does not change rendering.
             updateSystem.UpdateAt<RenderScaleController>(SystemUpdatePhase.Rendering);
 
             // UI
@@ -49,7 +50,7 @@ namespace FastTrack
                 }
             });
 
-            Log.Info("FastTrack v1.3.5-beta.1 loaded successfully; visual mutations=0.");
+            Log.Info("FastTrack v1.3.5-beta.2 loaded successfully; adaptive LOD is opt-in.");
         }
 
         public void OnDispose()

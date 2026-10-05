@@ -28,6 +28,7 @@ namespace TrafficStressTester
             if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
                 Log.Info($"Traffic Stress Lab asset location: {asset.path}");
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<TrafficStressSystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAt<TrafficStressUISystem>(SystemUpdatePhase.UIUpdate);
 

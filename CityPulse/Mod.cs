@@ -27,6 +27,7 @@ namespace CityPulse
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(setting));
             AssetDatabase.global.LoadSettings(nameof(CityPulse), setting, defaults);
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<AnalyticsScheduler>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAt<CityPulseUISystem>(SystemUpdatePhase.UIUpdate);
 

@@ -25,6 +25,7 @@ namespace Parkify
 
             AssetDatabase.global.LoadSettings(nameof(Parkify), setting, new ParkifySetting(this));
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<ParkifySystem>(SystemUpdatePhase.GameSimulation);
             log.Info("[Parkify] System registered: ParkifySystem (GameSimulation)");
 

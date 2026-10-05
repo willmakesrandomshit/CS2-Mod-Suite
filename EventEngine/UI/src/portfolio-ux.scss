@@ -1,0 +1,76 @@
+// Scoped to these mods; no game-wide element overrides.
+[data-portfolio-panel] {
+  font-family: inherit;
+  border-radius: 6px;
+  background: rgba(24, 34, 44, 0.98);
+
+  input, select, textarea {
+    font-family: inherit;
+    color: #edf2f5;
+    background: #14212b;
+    border: 1px solid #536674;
+    border-radius: 3px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+  }
+  button { font-family: inherit; }
+  button:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid #9bcfe6;
+    outline-offset: 1px;
+  }
+  button:disabled { cursor: default; opacity: 0.5; }
+  .suite-header, .panel-header, .ns-header, .pk-header {
+    background: #1d2c37;
+    border-bottom: 1px solid #465965;
+  }
+  .header-title { font-weight: 600; }
+  .active-pulse { animation: none; }
+}
+
+.portfolio-help {
+  color: #e6edf2;
+  background: #1a2934;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  flex-shrink: 0;
+  border-bottom: 1px solid #465965;
+  padding: 8px 12px;
+  box-sizing: border-box;
+
+  button {
+    background: #293e4c;
+    color: #edf2f5;
+    border: 1px solid #617785;
+    border-radius: 3px;
+    padding: 5px 9px;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    margin-right: 6px;
+    &:hover { background: #385468; }
+    &:focus { outline: 2px solid #9bcfe6; }
+  }
+  .portfolio-guide, .portfolio-support {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 8px;
+  }
+  ol { padding-left: 20px; margin: 0 0 6px; }
+  li { margin-bottom: 3px; }
+  p { margin: 6px 0; color: #bacbd6; }
+  textarea {
+    display: block;
+    width: 100%;
+    height: 110px;
+    box-sizing: border-box;
+    resize: none;
+    font-family: monospace;
+    font-size: 11px;
+    color: #edf2f5;
+    background: #14212b;
+    border: 1px solid #617785;
+    padding: 6px;
+    margin-bottom: 6px;
+  }
+}

@@ -69,6 +69,11 @@
           color: #f87171;
           border-color: rgba(239, 68, 68, 0.4);
         }
+        &.status-neutral {
+          background: rgba(148, 163, 184, 0.12);
+          color: #cbd5e1;
+          border-color: rgba(148, 163, 184, 0.24);
+        }
       }
 
       .suite-close-btn {
@@ -132,6 +137,7 @@
 
           &.status-good { color: #34d399; }
           &.status-problem { color: #f87171; }
+          &.status-neutral { color: #cbd5e1; }
         }
 
         .hero-desc {
@@ -258,7 +264,18 @@
       max-width: 360px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
 
-      .modal-icon { font-size: 32px; margin-bottom: 8px; }
+      .modal-icon {
+        display: inline-flex;
+        padding: 4px 7px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(245, 158, 11, 0.28);
+        border-radius: 4px;
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.45px;
+      }
       .modal-title { font-size: 16px; font-weight: 700; color: #ffffff; margin: 0 0 8px 0; }
       .modal-desc { font-size: 12px; color: #cbd5e1; line-height: 1.5; margin: 0 0 16px 0; }
 
@@ -334,4 +351,18 @@
   cursor: pointer;
 
   &:hover { background: #b91c1c; }
+}
+
+/* Suite surface pass: 2026-10 — restrained game-native panel treatment. */
+.saveguard-panel {
+  background: rgba(24, 34, 44, 0.97);
+  border-color: rgba(226, 235, 240, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.saveguard-panel .suite-header {
+  background: rgba(255, 255, 255, 0.035);
+  background-image: none;
 }

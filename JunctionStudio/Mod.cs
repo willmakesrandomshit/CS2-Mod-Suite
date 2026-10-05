@@ -12,6 +12,7 @@ namespace JunctionStudio
         public void OnLoad(UpdateSystem updateSystem)
         {
             Log.Info("Junction Studio v1.1.4-beta.1 loaded | release candidate");
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<AreaPaintToolSystem>(SystemUpdatePhase.ToolUpdate);
             updateSystem.UpdateAt<JunctionStudioSystem>(SystemUpdatePhase.UIUpdate);
 

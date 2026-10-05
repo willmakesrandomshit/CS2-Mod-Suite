@@ -386,3 +386,17 @@
     }
   }
 }
+
+/* Suite surface pass: 2026-10 — restrained game-native panel treatment. */
+.contourplus-panel {
+  background: rgba(24, 34, 44, 0.97);
+  border-color: rgba(226, 235, 240, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.contourplus-panel .suite-header {
+  background: rgba(255, 255, 255, 0.035);
+  background-image: none;
+}

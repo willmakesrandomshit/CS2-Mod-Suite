@@ -15,6 +15,7 @@ module.exports = {
   },
   externalsType: 'module',
   externals: {
+    'cs2/api': 'cs2/api',
     react: 'React',
     'react-dom': 'ReactDOM',
     'cs2/ui': 'cs2/ui',

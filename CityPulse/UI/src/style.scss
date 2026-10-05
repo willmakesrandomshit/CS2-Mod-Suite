@@ -79,6 +79,11 @@
           color: #f87171;
           border: 1px solid rgba(239, 68, 68, 0.4);
         }
+        &.status-waiting {
+          background: rgba(148, 163, 184, 0.12);
+          color: #cbd5e1;
+          border: 1px solid rgba(148, 163, 184, 0.24);
+        }
       }
 
       .suite-close-btn {
@@ -118,6 +123,12 @@
       background: rgba(245, 158, 11, 0.15);
       border-bottom: 1px solid rgba(245, 158, 11, 0.3);
       color: #fde047;
+    }
+
+    &.scanning {
+      background: rgba(100, 184, 196, 0.1);
+      border-bottom: 1px solid rgba(100, 184, 196, 0.22);
+      color: #b8dbe0;
     }
   }
 
@@ -196,6 +207,7 @@
           &.status-good { color: #34d399; }
           &.status-watch { color: #fbbf24; }
           &.status-problem { color: #f87171; }
+          &.status-waiting { color: #cbd5e1; }
         }
 
         .health-desc {
@@ -252,6 +264,7 @@
             &.status-good { background: rgba(16, 185, 129, 0.2); color: #34d399; }
             &.status-watch { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
             &.status-problem { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+            &.status-waiting { background: rgba(148, 163, 184, 0.12); color: #cbd5e1; }
           }
         }
 
@@ -541,4 +554,18 @@
     font-size: 12px;
     color: #94a3b8;
   }
+}
+
+/* Suite surface pass: 2026-10 — restrained game-native panel treatment. */
+.suite-panel {
+  background: rgba(24, 34, 44, 0.97);
+  border-color: rgba(226, 235, 240, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.suite-panel .suite-header {
+  background: rgba(255, 255, 255, 0.035);
+  background-image: none;
 }

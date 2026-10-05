@@ -32,10 +32,14 @@ namespace FastTrack
         private ValueBinding<bool>   m_DecalOptimized;
         private ValueBinding<bool>   m_LoadBoostActive;
         private ValueBinding<bool>   m_LoadBoostEnabled;
-        private ValueBinding<bool>   m_SafeMode;
-        private ValueBinding<int>    m_VisualMutations;
+        private ValueBinding<bool>   m_AdaptiveLodEnabled;
+        private ValueBinding<bool>   m_AdaptiveLodActive;
 
         private bool m_IsOpen;
+        private ValueBinding<int> m_SampleSequence;
+        private ValueBinding<bool> m_CanMeasure;
+        private ValueBinding<float> m_CameraAltitude;
+        private ValueBinding<bool> m_CameraMoving;
 
         protected override void OnCreate()
         {
@@ -65,12 +69,17 @@ namespace FastTrack
             m_DecalOptimized   = Bind<bool> ("decalOptimized",   false);
             m_LoadBoostActive  = Bind<bool> ("loadBoostActive",  false);
             m_LoadBoostEnabled = Bind<bool> ("loadBoostEnabled", false);
-            m_SafeMode         = Bind<bool> ("safeMode",          true);
-            m_VisualMutations  = Bind<int>  ("visualMutations",      0);
+            m_AdaptiveLodEnabled = Bind<bool>("adaptiveLodEnabled", false);
+            m_AdaptiveLodActive  = Bind<bool>("adaptiveLodActive",  false);
+            m_SampleSequence = Bind<int>("sampleSequence", 0);
+            m_CanMeasure = Bind<bool>("canMeasure", false);
+            m_CameraAltitude = Bind<float>("cameraAltitude", 0f);
+            m_CameraMoving = Bind<bool>("cameraMoving", false);
 
             AddBinding(new TriggerBinding(Group, "enable",   Enable));
             AddBinding(new TriggerBinding(Group, "restore",  Restore));
             AddBinding(new TriggerBinding<bool>(Group, "setEnabled", SetEnabled));
+            AddBinding(new TriggerBinding(Group, "toggleAdaptiveLod", ToggleAdaptiveLod));
             AddBinding(new TriggerBinding(Group, "toggle",   Toggle));
             AddBinding(new TriggerBinding(Group, "close",    Close));
             AddBinding(new TriggerBinding<string>(Group, "setPreset", SetPreset));
@@ -115,8 +124,13 @@ namespace FastTrack
             m_DecalOptimized.Update(FastTrackRuntime.DecalOptimizeActive);
             m_LoadBoostActive.Update(FastTrackRuntime.LoadingBoostActive);
             m_LoadBoostEnabled.Update(FastTrackRuntime.Enabled && Mod.Settings?.ExperimentalLoadingBoost == true && Mod.Settings?.DebugLoadingGroup == true);
-            m_SafeMode.Update(FastTrackRuntime.SafeMode);
-            m_VisualMutations.Update(FastTrackRuntime.VisualMutationCount);
+            m_AdaptiveLodEnabled.Update(Mod.Settings?.AdaptiveLodEnabled ?? false);
+            m_AdaptiveLodActive.Update(FastTrackRuntime.AdaptiveLodActive);
+            m_CameraAltitude.Update(FastTrackRuntime.CameraAltitude);
+            m_CameraMoving.Update(FastTrackRuntime.CameraMoving);
+            m_CanMeasure.Update(FastTrackRuntime.Enabled && Mod.Settings?.DebugProfilerGroup == true);
+            // Publish after the counters so subscribers see one coherent observation.
+            m_SampleSequence.Update(FastTrackRuntime.SampleSequence);
         }
 
         protected override void OnDestroy()
@@ -131,6 +145,12 @@ namespace FastTrack
         {
             if (enabled) Enable();
             else Restore();
+        }
+        private void ToggleAdaptiveLod()
+        {
+            if (Mod.Settings == null) return;
+            Mod.Settings.AdaptiveLodEnabled = !Mod.Settings.AdaptiveLodEnabled;
+            Mod.Settings.ApplyAndSave();
         }
         private void Toggle()   => m_IsOpen = !m_IsOpen;
         public void Open()      => m_IsOpen = true;

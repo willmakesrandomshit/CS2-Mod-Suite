@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useState, useEffect, useCallback } from 'react';
 import { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -46,6 +47,7 @@ const highVisibilityBinding = bindValue<boolean>('ContourPlus', 'highVisibility'
 
 const SPACING_PRESETS = [5, 10, 25, 50];
 
+const portfolioBindings = { "panelOpen": openBinding, "elevation": elevBinding, "slopePercent": slopePercentBinding, "slopeDegrees": slopeDegreesBinding, "hasRoad": hasRoadBinding, "startElevation": startElevationBinding, "endElevation": endElevationBinding, "elevationDelta": elevationDeltaBinding, "length": lengthBinding, "averageGrade": averageGradeBinding, "maxGrade": maxGradeBinding, "cutVolume": cutVolumeBinding, "fillVolume": fillVolumeBinding, "contoursActive": contoursActiveBinding, "interval": intervalBinding, "terrainMinElev": terrainMinElevBinding, "terrainMaxElev": terrainMaxElevBinding, "contourLevels": contourLevelsBinding, "generatedSegments": generatedSegmentsBinding, "renderedSegments": renderedSegmentsBinding, "generationTimeMs": generationTimeMsBinding, "highVisibility": highVisibilityBinding };
 export const ContourPlusToolbarButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(openBinding.value);
 
@@ -98,7 +100,7 @@ export const ContourPlusPanel: React.FC = () => {
   const [genTimeMs, setGenTimeMs] = useState(generationTimeMsBinding.value);
   const [highVis, setHighVis] = useState(highVisibilityBinding.value);
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("ContourPlus.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -178,7 +180,7 @@ export const ContourPlusPanel: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="suite-panel contourplus-panel" role="dialog" aria-label="Contour+ Panel">
+    <div className="suite-panel contourplus-panel" data-portfolio-panel role="dialog" aria-label="Contour+ Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -194,17 +196,18 @@ export const ContourPlusPanel: React.FC = () => {
           <span className="suite-badge status-good">
             {elev.toFixed(1)}m Elev
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.ContourPlus"} name={"Contour Plus"} version={"1.2.5-beta.1"} steps={["Enable contours and choose an interval.", "Inspect the terrain, then use the grade-planning controls.", "Turn contours off when finished."]} note={"Sampling is bounded. Readouts are planning estimates, not surveying data."} bindings={portfolioBindings} />
       <div className="suite-body">
         {!hasRoad ? (
           /* NO ROAD SELECTED — TOPOGRAPHY OVERVIEW */
@@ -214,7 +217,7 @@ export const ContourPlusPanel: React.FC = () => {
               <div className="hero-status-left">
                 <span className="hero-label">TOPOGRAPHY OVERLAYS</span>
                 <h3 className={`hero-title ${contoursActive ? (renderedSegments > 0 ? 'status-good' : 'status-warning') : 'status-muted'}`}>
-                  {contoursActive ? (renderedSegments > 0 ? `✓ Contours Active (${renderedSegments} lines)` : 'Contours Active (Sampling...)') : 'Contours Hidden'}
+                  {contoursActive ? (renderedSegments > 0 ? `Contours Active (${renderedSegments} lines)` : 'Contours Active (Sampling...)') : 'Contours Hidden'}
                 </h3>
                 <p className="hero-desc">
                   Elevation range: {minElev.toFixed(0)}m – {maxElev.toFixed(0)}m • {levelsCount} levels ({selectedInterval}m step)
@@ -279,7 +282,7 @@ export const ContourPlusPanel: React.FC = () => {
             </div>
 
             <div className="hint-card">
-              <span className="hint-icon">🛣️</span>
+              <span className="hint-icon">ROAD</span>
               <div className="hint-text">
                 <strong>Inspect Road Slopes</strong>
                 <p>Click any road in your city to inspect its grade percentage, slope category, elevation delta, and longitudinal profile.</p>
@@ -365,7 +368,7 @@ export const ContourPlusPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle earthwork calculations"
         >
-          {showAdvanced ? 'Hide Advanced ▴' : 'Earthwork ▸'}
+          {showAdvanced ? 'Hide Advanced' : 'Earthwork'}
         </button>
       </div>
 

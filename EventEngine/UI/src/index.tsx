@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useState, useEffect, useCallback } from 'react';
 import { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -24,7 +25,6 @@ interface EventData {
   title: string;
   category: number;
   categoryLabel: string;
-  categoryIcon: string;
   venueEntityIndex: number;
   venueName: string;
   expectedAttendance: number;
@@ -111,7 +111,6 @@ const normalizeEvent = (raw: unknown): EventData => {
     title: asText(event.title, 'Untitled Event'),
     category: asNumber(event.category),
     categoryLabel: asText(event.categoryLabel, 'Event'),
-    categoryIcon: asText(event.categoryIcon, '🎟️'),
     venueEntityIndex: asNumber(event.venueEntityIndex),
     venueName: asText(event.venueName, 'Unknown Venue'),
     expectedAttendance: asNumber(event.expectedAttendance),
@@ -139,16 +138,22 @@ const normalizeTab = (value: unknown): string =>
   typeof value === 'string' && validTabs.has(value) ? value : 'overview';
 
 const EVENT_CATEGORIES = [
-  { id: 0, label: 'Football Match', icon: '⚽' },
-  { id: 1, label: 'Sports Event', icon: '🏟️' },
-  { id: 2, label: 'Rock Concert', icon: '🎵' },
-  { id: 3, label: 'Festival & Fair', icon: '🎪' },
-  { id: 4, label: 'Live Show', icon: '🎤' },
-  { id: 5, label: 'Championship', icon: '🏆' },
-  { id: 6, label: 'Convention & Expo', icon: '👥' },
-  { id: 7, label: 'Custom Event', icon: '🎛️' },
+  { id: 0, label: 'Football Match', icon: 'FT' },
+  { id: 1, label: 'Sports Event', icon: 'SP' },
+  { id: 2, label: 'Rock Concert', icon: 'MC' },
+  { id: 3, label: 'Festival & Fair', icon: 'FF' },
+  { id: 4, label: 'Live Show', icon: 'LV' },
+  { id: 5, label: 'Championship', icon: 'CH' },
+  { id: 6, label: 'Convention & Expo', icon: 'EX' },
+  { id: 7, label: 'Custom Event', icon: 'CU' },
 ];
 
+const categoryCode = (label: string): string => {
+  const words = label.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+  return words.map((word) => word[0]).join('').slice(0, 2) || 'EV';
+};
+
+const portfolioBindings = { "isOpen": isOpenBinding, "activeEventsCount": activeEventsCountBinding, "isVenuePickingActive": isVenuePickingActiveBinding, "launcherSelected": launcherSelectedBinding };
 export const EventEngineToolbarButton: React.FC = () => {
   const [selected, setSelected] = useState(launcherSelectedBinding.value);
 
@@ -326,7 +331,7 @@ export const EventEnginePanel: React.FC = () => {
   const isArrivals = nextEvent && nextEvent.phase === 1;
 
   return (
-    <div className="suite-panel event-engine-panel" role="dialog" aria-label="Event Engine Panel">
+    <div className="suite-panel event-engine-panel" data-portfolio-panel role="dialog" aria-label="Event Engine Panel">
       {/* HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -340,14 +345,14 @@ export const EventEnginePanel: React.FC = () => {
           <span className={`suite-badge ${isLive ? 'status-live' : isArrivals ? 'status-warning' : 'status-good'}`}>
             {statusBadge}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {/* TOAST ALERTS */}
       {(uiToast || toastMessage) && (
         <div className="suite-toast">
-          <span>✓ {uiToast || toastMessage}</span>
+          <span>{uiToast || toastMessage}</span>
         </div>
       )}
 
@@ -386,6 +391,7 @@ export const EventEnginePanel: React.FC = () => {
       </div>
 
       {/* BODY CONTENT */}
+      <PortfolioHelp runtimeGroup={"Portfolio.EventEngine"} name={"Event Engine"} version={"0.2.1-beta.1"} steps={["Choose a supported venue.", "Set a start time, attendance and duration.", "Review the active event and stop it when finished."]} note={"Visit requests are bounded and do not guarantee that every requested visitor appears."} bindings={portfolioBindings} />
       <div className="suite-body">
         {/* ============================================================ */}
         {/* TAB 1: OVERVIEW */}
@@ -395,7 +401,6 @@ export const EventEnginePanel: React.FC = () => {
             {events.length === 0 ? (
               /* EMPTY STATE */
               <div className="suite-empty-state">
-                <div className="empty-icon">🏟️</div>
                 <h3 className="empty-title">No Events Scheduled</h3>
                 <p className="empty-desc">
                   Create a stadium match, concert, or festival and watch real citizens travel across your city to attend!
@@ -424,10 +429,10 @@ export const EventEnginePanel: React.FC = () => {
                 <div className="live-badge-row">
                   <span className="live-pulse-dot" />
                   <span className="live-tag">EVENT LIVE</span>
-                  <span className="live-category">{nextEvent.categoryIcon} {nextEvent.categoryLabel}</span>
+                  <span className="live-category"><span className="category-code">{categoryCode(nextEvent.categoryLabel)}</span> {nextEvent.categoryLabel}</span>
                 </div>
                 <h3 className="live-title">{nextEvent.title}</h3>
-                <div className="live-venue-tag">📍 {nextEvent.venueName}</div>
+                <div className="live-venue-tag">{nextEvent.venueName}</div>
 
                 <div className="live-stats-grid">
                   <div className="live-stat-card">
@@ -473,8 +478,8 @@ export const EventEnginePanel: React.FC = () => {
                     {nextEvent.minutesUntilEvent > 0 ? `Starts in ${nextEvent.minutesUntilEvent}m` : 'Starting Now'}
                   </span>
                 </div>
-                <h3 className="next-title">{nextEvent.categoryIcon} {nextEvent.title}</h3>
-                <div className="next-venue">📍 {nextEvent.venueName} • Starts at {nextEvent.startHour}:{String(nextEvent.startMinute).padStart(2, '0')} ({nextEvent.durationHours}h)</div>
+                <h3 className="next-title"><span className="category-code">{categoryCode(nextEvent.categoryLabel)}</span> {nextEvent.title}</h3>
+                <div className="next-venue">{nextEvent.venueName} | Starts at {nextEvent.startHour}:{String(nextEvent.startMinute).padStart(2, '0')} ({nextEvent.durationHours}h)</div>
 
                 <div className="next-metrics-row">
                   <div className="metric-pill">
@@ -509,14 +514,14 @@ export const EventEnginePanel: React.FC = () => {
                 <div className="events-list">
                   {events.map((ev) => (
                     <div key={ev.id} className="event-list-item">
-                      <div className="item-icon">{ev.categoryIcon}</div>
+                      <div className="item-icon">{categoryCode(ev.categoryLabel)}</div>
                       <div className="item-info">
                         <div className="item-title">{ev.title}</div>
-                        <div className="item-details">📍 {ev.venueName} • {ev.startHour}:{String(ev.startMinute).padStart(2, '0')} • {ev.expectedAttendance.toLocaleString()} Target</div>
+                        <div className="item-details">{ev.venueName} | {ev.startHour}:{String(ev.startMinute).padStart(2, '0')} | {ev.expectedAttendance.toLocaleString()} target</div>
                       </div>
                       <div className="item-status">
                         <span className={`phase-badge phase-${ev.phaseLabel.toLowerCase()}`}>{ev.phaseLabel}</span>
-                        <button className="item-del-btn" onClick={() => handleCancelEvent(ev.id)} title="Cancel Event">✕</button>
+                        <button className="item-del-btn" onClick={() => handleCancelEvent(ev.id)} title="Cancel Event" aria-label="Cancel event">×</button>
                       </div>
                     </div>
                   ))}
@@ -546,7 +551,6 @@ export const EventEnginePanel: React.FC = () => {
 
             {venues.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🏟️</div>
                 <h4 className="empty-title">No Venues Found</h4>
                 <p className="empty-desc">
                   Build a stadium, sports ground, arena, concert hall, monument or large entertainment venue in your city!
@@ -697,11 +701,11 @@ export const EventEnginePanel: React.FC = () => {
             <div className="form-section">
               <div className="label-with-val">
                 <label className="form-label">Transportation Planning Split</label>
-                <span className="val-badge">{carPercent}% Cars • {transitPercent}% Transit • {taxiPercent}% Taxi</span>
+                <span className="val-badge">{carPercent}% Cars | {transitPercent}% Transit | {taxiPercent}% Taxi</span>
               </div>
               <div className="modal-split-controls">
                 <div className="split-item">
-                  <span>🚗 Private Cars ({carPercent}%)</span>
+                  <span>Private cars ({carPercent}%)</span>
                   <input
                     type="range"
                     className="suite-slider"
@@ -716,7 +720,7 @@ export const EventEnginePanel: React.FC = () => {
                   />
                 </div>
                 <div className="split-item">
-                  <span>🚆 Transit ({transitPercent}%)</span>
+                  <span>Transit ({transitPercent}%)</span>
                   <input
                     type="range"
                     className="suite-slider"
@@ -751,25 +755,25 @@ export const EventEnginePanel: React.FC = () => {
             {nextEvent ? (
               <div className="traffic-stats-grid">
                 <div className="traffic-stat-card">
-                  <span className="card-icon">🚗</span>
+                  <span className="card-icon">CAR</span>
                   <span className="card-title">Projected Private Cars</span>
                   <span className="card-val">{nextEvent.carsCount.toLocaleString()}</span>
                   <span className="card-sub">{nextEvent.carUsagePercent}% Planning Share</span>
                 </div>
                 <div className="traffic-stat-card">
-                  <span className="card-icon">🚆</span>
+                  <span className="card-icon">TRANSIT</span>
                   <span className="card-title">Projected Public Transit</span>
                   <span className="card-val">{nextEvent.transitCount.toLocaleString()}</span>
                   <span className="card-sub">{nextEvent.transitUsagePercent}% Planning Share</span>
                 </div>
                 <div className="traffic-stat-card">
-                  <span className="card-icon">🚶</span>
+                  <span className="card-icon">WALK</span>
                   <span className="card-title">Projected Walking</span>
                   <span className="card-val">{nextEvent.walkingCount.toLocaleString()}</span>
                   <span className="card-sub">Walking &amp; Transfers</span>
                 </div>
                 <div className="traffic-stat-card">
-                  <span className="card-icon">🚕</span>
+                  <span className="card-icon">TAXI</span>
                   <span className="card-title">Projected Taxis &amp; Drop-offs</span>
                   <span className="card-val">{nextEvent.taxiCount.toLocaleString()}</span>
                   <span className="card-sub">{nextEvent.taxiUsagePercent}% Planning Share</span>
@@ -777,7 +781,6 @@ export const EventEnginePanel: React.FC = () => {
               </div>
             ) : (
               <div className="suite-empty-state">
-                <div className="empty-icon">🚦</div>
                 <div className="empty-title">No Active Event Traffic</div>
                 <div className="empty-desc">Schedule an event to observe live spectator traffic patterns.</div>
               </div>
@@ -807,7 +810,7 @@ export const EventEnginePanel: React.FC = () => {
 
             <div className="test-buttons-grid">
               <button className="test-btn" onClick={() => handleStartNow(nextEvent?.id ?? 0)}>
-                <span className="btn-icon">⚡</span>
+                <span className="btn-icon">NOW</span>
                 <div>
                   <div className="btn-title">Start Event Now</div>
                   <div className="btn-desc">Force event to immediately go LIVE</div>
@@ -815,7 +818,7 @@ export const EventEnginePanel: React.FC = () => {
               </button>
 
               <button className="test-btn" onClick={() => handleSimulateAttendance(nextEvent?.id ?? 0, 5000)}>
-                <span className="btn-icon">👥</span>
+                <span className="btn-icon">5K</span>
                 <div>
                   <div className="btn-title">5,000 Target Test</div>
                   <div className="btn-desc">Request a bounded batch of up to 3,500 trips</div>
@@ -823,7 +826,7 @@ export const EventEnginePanel: React.FC = () => {
               </button>
 
               <button className="test-btn" onClick={() => handleSimulateAttendance(nextEvent?.id ?? 0, 10000)}>
-                <span className="btn-icon">🏟️</span>
+                <span className="btn-icon">10K</span>
                 <div>
                   <div className="btn-title">10,000 Target Test</div>
                   <div className="btn-desc">Request a bounded batch of up to 3,500 trips</div>
@@ -831,7 +834,7 @@ export const EventEnginePanel: React.FC = () => {
               </button>
 
               <button className="test-btn" onClick={() => handleSimulateAttendance(nextEvent?.id ?? 0, 25000)}>
-                <span className="btn-icon">🔥</span>
+                <span className="btn-icon">25K</span>
                 <div>
                   <div className="btn-title">25,000 Target Test</div>
                   <div className="btn-desc">Request a bounded batch of up to 3,500 trips</div>
@@ -839,7 +842,7 @@ export const EventEnginePanel: React.FC = () => {
               </button>
 
               <button className="test-btn danger" onClick={() => handleEndEvent(nextEvent?.id ?? 0)}>
-                <span className="btn-icon">🏁</span>
+                <span className="btn-icon">END</span>
                 <div>
                   <div className="btn-title">End Current Event</div>
                   <div className="btn-desc">Trigger post-event departures</div>
@@ -847,7 +850,7 @@ export const EventEnginePanel: React.FC = () => {
               </button>
 
               <button className="test-btn danger" onClick={handleResetAll}>
-                <span className="btn-icon">🗑️</span>
+                <span className="btn-icon">CLR</span>
                 <div>
                   <div className="btn-title">Reset Event Engine State</div>
                   <div className="btn-desc">Wipe all active and scheduled events</div>
@@ -861,7 +864,7 @@ export const EventEnginePanel: React.FC = () => {
       {/* FOOTER */}
       <div className="suite-footer">
         <span className="footer-hint">
-          {events.length} Events Scheduled • {venues.length} Venues Active
+          {events.length} events scheduled | {venues.length} venues active
         </span>
         <span className="footer-version">Event Engine v0.2.0-BETA</span>
       </div>

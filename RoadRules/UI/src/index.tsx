@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useState, useEffect, useCallback } from 'react';
 import { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -63,12 +64,12 @@ const hasClipboardBinding = bindValue<boolean>('RoadRules', 'hasClipboard', fals
 const lanesBinding = bindValue<LaneInfo[]>('RoadRules', 'lanes', []);
 
 const VEHICLE_FLAGS = [
-  { flag: 1, label: 'Cars', icon: '🚗', tooltip: 'Private road vehicles. Blocked by the native public-lane gate.' },
-  { flag: 2, label: 'Heavy Traffic', icon: '🚚', tooltip: 'Freight is discouraged by CS2’s native heavy-traffic rule; this is soft avoidance.' },
-  { flag: 4, label: 'Buses', icon: '🚌', tooltip: 'Part of CS2’s shared public-lane category.' },
-  { flag: 8, label: 'Taxis', icon: '🚕', tooltip: 'Part of CS2’s shared public-lane category.' },
-  { flag: 16, label: 'Emergency', icon: '🚑', tooltip: 'Part of CS2’s shared public-lane category and not independently blocked.' },
-  { flag: 32, label: 'Services', icon: '🚛', tooltip: 'Supported service vehicles share CS2’s public-lane category.' },
+  { flag: 1, label: 'Cars', icon: 'CAR', tooltip: 'Private road vehicles. Blocked by the native public-lane gate.' },
+  { flag: 2, label: 'Heavy Traffic', icon: 'HGV', tooltip: 'Freight is discouraged by CS2’s native heavy-traffic rule; this is soft avoidance.' },
+  { flag: 4, label: 'Buses', icon: 'BUS', tooltip: 'Part of CS2’s shared public-lane category.' },
+  { flag: 8, label: 'Taxis', icon: 'TAXI', tooltip: 'Part of CS2’s shared public-lane category.' },
+  { flag: 16, label: 'Emergency', icon: 'EMS', tooltip: 'Part of CS2’s shared public-lane category and not independently blocked.' },
+  { flag: 32, label: 'Services', icon: 'SVC', tooltip: 'Supported service vehicles share CS2’s public-lane category.' },
 ];
 
 const QUICK_PRESETS = [
@@ -80,6 +81,7 @@ const QUICK_PRESETS = [
   { id: 'LaneClosed', label: 'Close Road', desc: 'Hard-block every physical lane on this carriageway', all: true },
 ];
 
+const portfolioBindings = { "panelOpen": openBinding, "toolActive": toolActiveBinding, "hasSelection": hasSelectionBinding, "selectedEdgeId": selectedEdgeIdBinding, "totalSubLanes": totalSubLanesBinding, "rawCarLanes": rawCarLanesBinding, "directionMatchedCarLanes": directionMatchedCarLanesBinding, "carriagewayMatchedCarLanes": carriagewayMatchedCarLanesBinding, "filteredOutSubLanes": filteredOutSubLanesBinding, "propagationActive": propagationActiveBinding, "rebuildsCount": rebuildsCountBinding, "vehiclesRerouted": vehiclesReroutedBinding, "activeEnforced": activeEnforcedBinding, "existingPathsSignaled": existingPathsSignaledBinding, "nativeUpdateRequested": nativeUpdateRequestedBinding, "observedCars": observedCarsBinding, "observedTrucks": observedTrucksBinding, "observedBuses": observedBusesBinding, "observedTaxis": observedTaxisBinding, "observedEmergency": observedEmergencyBinding, "observedServices": observedServicesBinding, "observedViolations": observedViolationsBinding, "laneCount": laneCountBinding, "selectedLaneIdx": selectedLaneIdxBinding, "allowedVehicles": allowedVehiclesBinding, "isLocalAccess": isLocalAccessBinding, "isClosed": isClosedBinding, "hasClipboard": hasClipboardBinding };
 export const RoadRulesToolbarButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(openBinding.value);
   const [isToolActive, setIsToolActive] = useState(toolActiveBinding.value);
@@ -152,7 +154,7 @@ export const RoadRulesPanel: React.FC = () => {
   const [hasClipboard, setHasClipboard] = useState(hasClipboardBinding.value);
   const [lanes, setLanes] = useState<LaneInfo[]>(lanesBinding.value || []);
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("RoadRules.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -272,7 +274,7 @@ export const RoadRulesPanel: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="suite-panel road-rules-panel" role="dialog" aria-label="Road Rules Panel">
+    <div className="suite-panel road-rules-panel" data-portfolio-panel role="dialog" aria-label="Road Rules Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -290,22 +292,22 @@ export const RoadRulesPanel: React.FC = () => {
               {presetName || 'Custom'}
             </span>
           )}
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.RoadRules"} name={"Road Rules"} version={"1.4.5-beta.1"} steps={["Select a road and inspect its physical lanes.", "Choose a lane rule or preset, then review the overlay.", "Observe actual vehicles before applying the rule more widely."]} note={"Some rules are soft preferences. A painted overlay is not proof of enforcement."} bindings={portfolioBindings} />
       <div className="suite-body">
         {!hasSelection ? (
           /* EMPTY STATE */
           <div className="suite-empty-state">
-            <div className="empty-icon">🛣️</div>
             <h3 className="empty-title">Select a Road</h3>
             <p className="empty-desc">
               Select a road to close physical lanes, discourage heavy traffic, or apply CS2's shared public/service-lane gate. Press Esc or right-click to cancel selection.
@@ -318,7 +320,7 @@ export const RoadRulesPanel: React.FC = () => {
               {isToolActive ? 'Click Road on Map...' : 'Select Road'}
             </button>
             <div className="empty-hint">
-              {isToolActive ? '✓ Road selector active — click any carriageway' : 'Point and click any road segment to inspect'}
+              {isToolActive ? 'Road selector active — click any carriageway' : 'Point and click any road segment to inspect'}
             </div>
           </div>
         ) : (
@@ -422,7 +424,7 @@ export const RoadRulesPanel: React.FC = () => {
                     >
                       <span className="chip-icon">{v.icon}</span>
                       <span className="chip-name">{v.label}</span>
-                      <span className="chip-status">{isClosed ? 'Closed' : isAllowed ? '✓' : '✕'}</span>
+                      <span className="chip-status">{isClosed ? 'Closed' : isAllowed ? 'Allowed' : 'Blocked'}</span>
                     </div>
                   );
                 })}
@@ -436,7 +438,7 @@ export const RoadRulesPanel: React.FC = () => {
                   disabled={isClosed}
                   title="Apply a soft path-cost bias against through traffic; this is not a hard destination-only gate"
                 >
-                  <span className="special-icon">🏡</span>
+                  <span className="special-icon">LOCAL</span>
                   <div className="special-info">
                     <span className="special-title">Local Bias (Experimental)</span>
                     <span className="special-desc">Discourage through-routing</span>
@@ -449,7 +451,7 @@ export const RoadRulesPanel: React.FC = () => {
                   onClick={() => setClosedMode(!isClosed)}
                   title="Completely close lane to all vehicles in CS2 simulation"
                 >
-                  <span className="special-icon">⛔</span>
+                  <span className="special-icon">CLOSE</span>
                   <div className="special-info">
                     <span className="special-title">Close Lane</span>
                     <span className="special-desc">Block all traffic</span>

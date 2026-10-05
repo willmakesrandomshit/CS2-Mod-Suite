@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useCallback, useEffect, useState } from 'react';
 import type { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -26,6 +27,7 @@ function useBinding<T>(b: any): T {
   return value;
 }
 
+const portfolioBindings = { "open": open, "showButton": showButton, "enabled": enabled, "interval": interval, "successes": successes, "failures": failures };
 const ToolbarButton: React.FC = () => {
   const visible = useBinding<boolean>(showButton);
   const selected = useBinding<boolean>(open);
@@ -58,13 +60,14 @@ const Panel: React.FC = () => {
   if (!isOpen) return null;
 
   const connected = connection === 'Connected';
-  return <div className="drpc-panel" role="dialog" aria-label="Discord RPC">
+  return <div className="drpc-panel" data-portfolio-panel role="dialog" aria-label="Discord RPC">
     <header><img src={iconSrc}/><div><h2>Discord RPC</h2><span>Rich presence, under your control</span></div><button onClick={close}>×</button></header>
     <div className={`status-strip ${connected ? 'ok' : isEnabled ? 'warn' : 'off'}`}><b>{connection}</b><span>{connectionMessage}</span></div>
     <nav>
       {(['status','privacy','templates','integrations'] as const).map(t => <button className={tab===t?'active':''} onClick={()=>setTab(t)}>{t}</button>)}
     </nav>
-    <main>
+    <PortfolioHelp runtimeGroup={"Portfolio.DiscordRPC"} name={"Discord RPC"} version={"0.9.0-beta.1"} steps={["Check the connection status with Discord running.", "Choose a privacy preset before enabling enhanced presence.", "Review the displayed activity and use Refresh now."]} note={"The preview is not proof that Discord accepted the activity. Check the actual Discord client."} bindings={portfolioBindings} />
+      <main>
       {tab === 'status' && <>
         <section className="preview"><div className="preview-icon"><img src={iconSrc}/></div><div><small>PLAYING CITIES: SKYLINES II</small><strong>{detailsText}</strong><span>{stateText}</span><span>{gameMode} · Source: {activitySource}</span></div></section>
         <div className="grid"><article><label>Connection</label><b>{connection}</b></article><article><label>Last update</label><b>{updated}</b></article><article><label>Interval</label><b>{seconds}s</b></article><article><label>Accepted / failed</label><b>{okCount} / {failCount}</b></article></div>

@@ -185,7 +185,7 @@
         background: rgba(30, 41, 59, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 8px;
-        cursor: pointer;
+        cursor: default;
 
         &:hover {
           background: rgba(51, 65, 85, 0.7);
@@ -199,7 +199,9 @@
         }
 
         .preset-icon {
-          font-size: 22px;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.4px;
           margin-right: 12px;
         }
 
@@ -227,6 +229,19 @@
           font-weight: 700;
           color: #34d399;
           margin-left: 8px;
+        }
+      }
+
+      button.preset-card {
+        width: 100%;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &:focus-visible {
+          outline: 2px solid #8cc8ff;
+          outline-offset: 2px;
         }
       }
     }
@@ -282,4 +297,18 @@
       line-height: 1.4;
     }
   }
+}
+
+/* Suite surface pass: 2026-10 — restrained game-native panel treatment. */
+.fasttrack-panel {
+  background: rgba(24, 34, 44, 0.97);
+  border-color: rgba(226, 235, 240, 0.14);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.42);
+  backdrop-filter: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.fasttrack-panel .suite-header {
+  background: rgba(255, 255, 255, 0.035);
+  background-image: none;
 }

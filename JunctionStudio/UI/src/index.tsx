@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useEffect, useState, useCallback } from "react";
 import type { ModRegistrar } from "cs2/modding";
 import { bindValue, trigger } from "cs2/api";
@@ -10,6 +11,8 @@ const hasClipboard = bindValue<boolean>("junctionStudio", "hasClipboard", false)
 const presets      = bindValue<string>("junctionStudio", "presets", "");
 const message      = bindValue<string>("junctionStudio", "message", "Junction Studio ready");
 const open         = bindValue<boolean>("junctionStudio", "panelOpen", false);
+const previewArmed = bindValue<boolean>("junctionStudio", "previewArmed", false);
+const canRestore = bindValue<boolean>("junctionStudio", "canRestorePrevious", false);
 
 function useB<T>(b: any): T {
   const [v, set] = useState<T>(b.value);
@@ -21,6 +24,7 @@ function useB<T>(b: any): T {
   return v;
 }
 
+const portfolioBindings = { "selected": selected, "hasClipboard": hasClipboard, "panelOpen": open, "previewArmed": previewArmed, "canRestorePrevious": canRestore };
 export const JunctionStudioToolbarButton: React.FC = () => {
   const isOpen = useB<boolean>(open);
   const toggle = useCallback(() => trigger("junctionStudio", "togglePanel"), []);
@@ -43,8 +47,10 @@ export const JunctionStudioPanel: React.FC = () => {
   const clip = useB<boolean>(hasClipboard);
   const names = useB<string>(presets).split("\n").filter(Boolean);
   const status = useB<string>(message);
+  const preview = useB<boolean>(previewArmed);
+  const restore = useB<boolean>(canRestore);
   const [name, setName] = useState("");
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("JunctionStudio.showAdvanced", false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const close = useCallback(() => trigger("junctionStudio", "closePanel"), []);
@@ -54,12 +60,13 @@ export const JunctionStudioPanel: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (confirmDelete) setConfirmDelete(null);
+        else if (preview) trigger("junctionStudio", "cancelPreview");
         else close();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [visible, confirmDelete, close]);
+  }, [visible, confirmDelete, preview, close]);
 
   const copyJunction = () => {
     trigger("junctionStudio", "copy");
@@ -92,7 +99,7 @@ export const JunctionStudioPanel: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="suite-panel junction-studio-panel" role="dialog" aria-label="Junction Studio Panel">
+    <div className="suite-panel junction-studio-panel" data-portfolio-panel role="dialog" aria-label="Junction Studio Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -106,12 +113,19 @@ export const JunctionStudioPanel: React.FC = () => {
           <span className={`suite-badge ${ready ? "status-good" : "status-watch"}`}>
             {ready ? "Selected" : "No Selection"}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.JunctionStudio"} name={"Junction Studio"} version={"1.1.4-beta.1"} steps={["Enable Town Road Lane and select a junction with its marking tool.", "Copy markings or save a named preset.", "Apply to a compatible junction and inspect the result."]} note={"Requires Town Road Lane. Magic Marking conflicts with that dependency. This tool changes visual markings, not traffic routing."} bindings={portfolioBindings} />
       <div className="suite-body">
+        {preview && <div className="portfolio-help" role="status">
+          <p>{status}</p>
+          <button type="button" onClick={() => trigger("junctionStudio", "confirmApply")}>Confirm replacement</button>
+          <button type="button" onClick={() => trigger("junctionStudio", "cancelPreview")}>Cancel</button>
+        </div>}
+        {restore && <button type="button" className="suite-secondary-btn" onClick={() => trigger("junctionStudio", "restorePrevious")}>Restore previous markings</button>}
         {!ready ? (
           <div className="suite-empty-state">
             <h3 className="empty-title">Select a Junction in Town Road Lane</h3>
@@ -186,14 +200,14 @@ export const JunctionStudioPanel: React.FC = () => {
                         className="suite-secondary-btn compact"
                         onClick={() => applyPreset(item)}
                       >
-                        Apply
+                        Preview
                       </button>
                       <button
                         className="suite-secondary-btn compact delete"
                         onClick={() => deletePreset(item)}
                         title={confirmDelete === item ? "Click again to permanently delete" : "Delete preset"}
                       >
-                        {confirmDelete === item ? "Confirm?" : "✕"}
+                        {confirmDelete === item ? "Confirm?" : "Delete"}
                       </button>
                     </div>
                   </div>
@@ -212,7 +226,7 @@ export const JunctionStudioPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle topology diagnostics"
         >
-          {showAdvanced ? "Hide Advanced ▴" : "Advanced Topology ▸"}
+          {showAdvanced ? "Hide Advanced" : "Advanced Topology"}
         </button>
       </div>
 

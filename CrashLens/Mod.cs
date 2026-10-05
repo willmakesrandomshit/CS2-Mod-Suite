@@ -23,6 +23,7 @@ namespace CrashLens
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(Settings));
             AssetDatabase.global.LoadSettings(nameof(CrashLens), Settings, defaults);
             CrashLensRuntime.Initialize();
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<HealthMonitorSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<CrashLensUISystem>(SystemUpdatePhase.UIUpdate);
 

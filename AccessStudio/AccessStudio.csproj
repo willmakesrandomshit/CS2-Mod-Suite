@@ -21,6 +21,7 @@
     <Reference Include="Unity.Entities"><Private>false</Private></Reference>
     <Reference Include="Unity.Collections"><Private>false</Private></Reference>
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><Private>false</Private></Reference>
   </ItemGroup>
   <Target Name="BuildUI" BeforeTargets="BeforeBuild">
     <Exec WorkingDirectory="UI" Command="npm run build" />

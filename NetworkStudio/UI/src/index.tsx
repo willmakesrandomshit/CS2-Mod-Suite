@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useEffect } from 'react';
 import { FloatingButton, Tooltip } from 'cs2/ui';
 import { useValue, trigger, bindValue } from 'cs2/bindings';
@@ -9,6 +10,7 @@ const selectedEdgeId$ = bindValue<number>('NetworkStudio', 'selectedEdgeId', 0);
 const furnitureCount$ = bindValue<number>('NetworkStudio', 'furnitureCount', 0);
 const furnitureJson$ = bindValue<string>('NetworkStudio', 'furnitureJson', '[]');
 
+const portfolioBindings = { "isOpen": isOpen$, "selectedEdgeId": selectedEdgeId$, "furnitureCount": furnitureCount$ };
 export const NetworkStudioToolbarButton: React.FC = () => {
   const isOpen = useValue(isOpen$);
 
@@ -63,12 +65,13 @@ export const NetworkStudioPanel: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="ns-panel">
+    <div className="ns-panel" data-portfolio-panel>
       <div className="ns-header">
         <h2>Network Studio (Prototype)</h2>
-        <button className="ns-close-btn" onClick={close}>✕</button>
+        <button className="ns-close-btn" onClick={close} aria-label="Close panel">×</button>
       </div>
 
+      <PortfolioHelp runtimeGroup={"Portfolio.NetworkStudio"} name={"Network Studio"} version={"0.1.0"} steps={["Select a road segment.", "Inspect the detected furniture and distance from the road centre.", "Clear selection or close the panel when finished."]} note={"This candidate is inspection-only. Furniture relocation is withheld pending recovery and reload verification."} bindings={portfolioBindings} />
       <div className="ns-content">
         <div className="ns-empty-state">
           <p><strong>Inspection only in this local candidate.</strong></p>

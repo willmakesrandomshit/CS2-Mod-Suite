@@ -20,6 +20,7 @@ namespace DiscordRPC
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(Settings));
             AssetDatabase.global.LoadSettings(nameof(DiscordRPC), Settings, new DiscordRPCSetting(this));
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<DiscordRPCSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<DiscordRPCUISystem>(SystemUpdatePhase.UIUpdate);
         }

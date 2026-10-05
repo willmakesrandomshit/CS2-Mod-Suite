@@ -48,6 +48,7 @@ namespace FastTrack
             Array.Clear(m_GpuSamples, 0, k_SampleCount);
             m_SampleIndex = 0;
             m_Elapsed = m_LogElapsed = 0f;
+            FastTrackRuntime.SampleSequence = 0;
         }
 
         protected override void OnUpdate()
@@ -101,6 +102,7 @@ namespace FastTrack
 
             FastTrackRuntime.IsGpuBound = gpuOverBudget;
             FastTrackRuntime.IsCpuBound = mainOverBudget && !FastTrackRuntime.IsGpuBound;
+            FastTrackRuntime.SampleSequence++;
 
             if (m_LogElapsed >= 60f)
             {

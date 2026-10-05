@@ -24,6 +24,7 @@
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
     <Reference Include="TownRoadLane" HintPath="$(TownRoadLanePath)"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><Private>false</Private></Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Update="System"><Private>false</Private></Reference>

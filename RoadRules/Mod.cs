@@ -34,6 +34,7 @@ namespace RoadRules
             AssetDatabase.global.LoadSettings(nameof(RoadRules), setting, defaults);
 
             // Register systems in appropriate simulation phases
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<RoadRulesSystem>(SystemUpdatePhase.GameSimulation);
             log.Info("[RoadRules] System registered: RoadRulesSystem (GameSimulation)");
 

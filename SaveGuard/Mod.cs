@@ -29,6 +29,7 @@ namespace SaveGuard
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(SettingInstance));
             AssetDatabase.global.LoadSettings(nameof(SaveGuard), SettingInstance, defaults);
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<SaveGuardSystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAt<SaveGuardUISystem>(SystemUpdatePhase.UIUpdate);
 

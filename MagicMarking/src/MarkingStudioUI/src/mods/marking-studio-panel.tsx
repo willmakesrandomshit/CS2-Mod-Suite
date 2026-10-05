@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "../portfolio-ux";
 // React's KeyboardEvent is aliased — the bare name must keep referring to the
 // DOM type (the document-level hotkey handler below is typed against it).
 import { ChangeEvent, Component, ErrorInfo, KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent, ReactNode, useEffect, useState } from "react";
@@ -227,6 +228,7 @@ const makeAreaStyleOptions = (t: ReturnType<typeof useT>, pinned: number[]): Dro
 
 // Exported wrapper — boundary first, then real panel. moduleRegistry mounts
 // this into GameTopRight, so the boundary protects the game UI from our bugs.
+const portfolioBindings = {  };
 export const MarkingStudioPanel = () => (
   <PanelErrorBoundary>
     <TooltipProvider>
@@ -658,7 +660,7 @@ const MarkingStudioPanelInner = () => {
           </Tooltip>
         </PanelHeaderRow>
         <div style={{ textAlign: "center", padding: "28rem 16rem" }}>
-          <div style={{ fontSize: "28rem", marginBottom: "8rem" }}>🎨</div>
+          <div style={{ marginBottom: "8rem", fontSize: "11rem", fontWeight: 700, letterSpacing: "1rem", color: T.colorAccent }}>MARKING STUDIO</div>
           <h3 style={{ margin: "0 0 6rem 0", fontSize: "14rem", fontWeight: "bold", color: "#f1f5f9" }}>
             Select a Road or Junction
           </h3>
@@ -690,7 +692,8 @@ const MarkingStudioPanelInner = () => {
   return (
     <>
       <Panel>
-        <PanelStickyChrome>
+        <PortfolioHelp runtimeGroup={"Portfolio.MarkingStudio"} name={"Magic Marking"} version={"2.4.1-beta.1"} steps={["Activate the marking tool and select a road or junction.", "Choose a line or area style and inspect the drawing preview.", "Use Undo/Redo to recover from a change."]} note={"Enable Magic Marking or Town Road Lane, not both. Road markings do not change traffic rules."} bindings={portfolioBindings} />
+      <PanelStickyChrome>
           <PanelHeaderRow>
             <PanelTitle>{t("panel.appTitle")}</PanelTitle>
             <Tooltip content={t("panel.close.tooltip")}>
@@ -848,7 +851,7 @@ const MarkingStudioPanelInner = () => {
                           }}
                           onClick={() => cmdSetCurrentDrawingMode(DRAWING_MODE.FollowRoad)}
                         >
-                          🛣️ Follow Road
+                          Follow Road
                         </Btn>
                       </Tooltip>
                       <Tooltip content="Direct straight chord between endpoints">
@@ -860,7 +863,7 @@ const MarkingStudioPanelInner = () => {
                           }}
                           onClick={() => cmdSetCurrentDrawingMode(DRAWING_MODE.Straight)}
                         >
-                          📏 Straight
+                          Straight
                         </Btn>
                       </Tooltip>
                       <Tooltip content="Custom curvature with manual pull & bulge">
@@ -872,7 +875,7 @@ const MarkingStudioPanelInner = () => {
                           }}
                           onClick={() => cmdSetCurrentDrawingMode(DRAWING_MODE.CustomCurve)}
                         >
-                          🎨 Custom
+                          Custom
                         </Btn>
                       </Tooltip>
                     </div>

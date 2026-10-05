@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useEffect, useState, useCallback } from "react";
 import type { ModRegistrar } from "cs2/modding";
 import { bindValue, trigger } from "cs2/api";
@@ -30,6 +31,7 @@ const INTENSITY_LEVELS = [
   { value: 25, label: "Gridlock Stress", desc: "Aggressive 25x request pressure with a larger bounded queue" },
 ];
 
+const portfolioBindings = { "multiplier": mult, "enabled": enabled, "panelOpen": open, "showButton": show, "generated": generated };
 export const TrafficStressToolbarButton: React.FC = () => {
   const visible = useB(show);
   const isOpen = useB(open);
@@ -55,7 +57,7 @@ export const TrafficStressPanel: React.FC = () => {
   const speed = useB(ramp);
 
   const [selectedIntensity, setSelectedIntensity] = useState<number>(m > 1 ? m : 2);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("TrafficStressLab.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -92,7 +94,7 @@ export const TrafficStressPanel: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="suite-panel traffic-stress-panel" role="dialog" aria-label="Traffic Stress Lab Panel">
+    <div className="suite-panel traffic-stress-panel" data-portfolio-panel role="dialog" aria-label="Traffic Stress Lab Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -106,17 +108,18 @@ export const TrafficStressPanel: React.FC = () => {
           <span className={`suite-badge ${isRunning ? "status-watch" : "status-good"}`}>
             {isRunning ? `${m}x Requests` : "No Extra Requests"}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.TrafficStressTester"} name={"Traffic Stress Lab"} version={"1.5.5-beta.1"} steps={["Use a disposable city and start with Light pressure.", "Watch request counts and actual traffic separately.", "Stop the test to stop generating new extra requests."]} note={"Queued requests and existing vehicles finish normally after stopping. Requests are not guaranteed visible vehicles."} bindings={portfolioBindings} />
       <div className="suite-body">
         {isRunning ? (
           /* RUNNING TEST VIEW */
@@ -180,7 +183,7 @@ export const TrafficStressPanel: React.FC = () => {
                 onClick={() => startTest(selectedIntensity)}
                 title="Start traffic stress simulation"
               >
-                ▶ Start Test ({selectedIntensity}x)
+                Start Test ({selectedIntensity}x)
               </button>
               <p className="footer-hint">Use a disposable test city first. High settings can congest the network and reduce simulation speed.</p>
             </div>
@@ -198,7 +201,7 @@ export const TrafficStressPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle advanced simulation options"
         >
-          {showAdvanced ? "Hide Advanced ▴" : "Advanced ▸"}
+          {showAdvanced ? "Hide Advanced" : "Advanced"}
         </button>
       </div>
 

@@ -1,3 +1,5 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
+import { PerformanceComparison } from './performance-comparison';
 import React, { useEffect, useState, useCallback } from "react";
 import type { ModRegistrar } from "cs2/modding";
 import { bindValue, trigger } from "cs2/api";
@@ -21,8 +23,9 @@ const b_isGpuBound  = bindValue<boolean>("fastTrack", "isGpuBound",      false);
 const b_isCpuBound  = bindValue<boolean>("fastTrack", "isCpuBound",      false);
 const b_loadBoost   = bindValue<boolean>("fastTrack", "loadBoostActive", false);
 const b_loadBoostEnabled = bindValue<boolean>("fastTrack", "loadBoostEnabled", false);
-const b_safeMode    = bindValue<boolean>("fastTrack", "safeMode",        true);
-const b_visualMut   = bindValue<number> ("fastTrack", "visualMutations", 0);
+const b_lodScale    = bindValue<number> ("fastTrack", "lodScale",        1);
+const b_adaptiveLod = bindValue<boolean>("fastTrack", "adaptiveLodEnabled", false);
+const b_lodActive   = bindValue<boolean>("fastTrack", "adaptiveLodActive",  false);
 
 function useB<T>(b: { value: T; subscribe(c: (v: T) => void): { value: T; dispose(): void } }): T {
   const [v, set] = useState<T>(b.value);
@@ -34,6 +37,7 @@ function useB<T>(b: { value: T; subscribe(c: (v: T) => void): { value: T; dispos
   return v;
 }
 
+const portfolioBindings = { "enabled": b_enabled, "fps": b_fps, "loadSeconds": b_loadSecs, "mainThreadMs": b_mainMs, "gpuMs": b_gpuMs, "drawCalls": b_drawCalls, "open": b_open, "showButton": b_showBtn, "isGpuBound": b_isGpuBound, "isCpuBound": b_isCpuBound, "loadBoostActive": b_loadBoost, "loadBoostEnabled": b_loadBoostEnabled, "lodScale": b_lodScale, "adaptiveLodEnabled": b_adaptiveLod, "adaptiveLodActive": b_lodActive };
 export const FastTrackToolbarButton: React.FC = () => {
   const isOpen = useB(b_open);
   const showBtn = useB(b_showBtn);
@@ -42,7 +46,7 @@ export const FastTrackToolbarButton: React.FC = () => {
   if (!showBtn) return null;
 
   return (
-    <Tooltip tooltip="FastTrack — Performance tools and monitoring">
+    <Tooltip tooltip="FastTrack — Adaptive detail and performance monitoring">
       <FloatingButton
         src={iconSrc}
         selected={isOpen}
@@ -68,10 +72,11 @@ export const FastTrackPanel: React.FC = () => {
   const isCpuBound  = useB(b_isCpuBound);
   const loadBoost   = useB(b_loadBoost);
   const loadBoostEnabled = useB(b_loadBoostEnabled);
-  const safeMode    = useB(b_safeMode);
-  const visualMut   = useB(b_visualMut);
+  const lodScale    = useB(b_lodScale);
+  const adaptiveLod = useB(b_adaptiveLod);
+  const lodActive   = useB(b_lodActive);
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("FastTrack.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -80,6 +85,10 @@ export const FastTrackPanel: React.FC = () => {
   };
 
   const close = useCallback(() => trigger("fastTrack", "close"), []);
+  const toggleAdaptiveLod = useCallback(() => {
+    trigger("fastTrack", "toggleAdaptiveLod");
+    showToast(adaptiveLod ? "Adaptive Detail off — native LOD restored" : "Adaptive Detail on — applies at distant views");
+  }, [adaptiveLod]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -92,40 +101,41 @@ export const FastTrackPanel: React.FC = () => {
 
   const toggleEnabled = () => {
     trigger("fastTrack", "setEnabled", !enabled);
-    showToast(!enabled ? "Enabled visual-safe monitoring" : "Restored vanilla and paused FastTrack");
+    showToast(!enabled ? "FastTrack enabled" : "Native LOD restored; FastTrack paused");
   };
 
   if (!isOpen) return null;
 
   const fpsStatus = fps >= 50 ? "status-good" : fps >= 30 ? "status-watch" : "status-problem";
-  const fpsText = fps >= 50 ? "Smooth" : fps >= 30 ? "Playable" : "Lagging";
+  const fpsText = fps <= 0 ? "Measuring" : fps >= 50 ? "Smooth" : fps >= 30 ? "Playable" : "Lagging";
 
   return (
-    <div className="suite-panel fasttrack-panel" role="dialog" aria-label="FastTrack Panel">
+    <div className="suite-panel fasttrack-panel" data-portfolio-panel role="dialog" aria-label="FastTrack Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
           <img src={iconSrc} alt="FastTrack" className="header-icon" />
           <div>
             <h2 className="header-title">FastTrack</h2>
-            <span className="header-subtitle">Performance Diagnostics & Load-Stage Tuning</span>
+            <span className="header-subtitle">Adaptive Detail & Performance</span>
           </div>
         </div>
         <div className="header-right">
           <span className={`suite-badge ${fpsStatus}`}>
             {fps} FPS • {fpsText}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.FastTrack"} name={"FastTrack"} version={"1.3.5-beta.2"} steps={["Keep the camera and simulation speed steady while measuring.", "Capture a baseline, change one option, then capture a comparison.", "Inspect Adaptive Detail status; zoom in to check restored detail."]} note={"A comparison is observational. Camera, simulation and other mods can affect FPS."} bindings={portfolioBindings} />
       <div className="suite-body">
         {/* HERO STATUS CARD */}
         <div className="hero-status-card">
@@ -136,38 +146,38 @@ export const FastTrackPanel: React.FC = () => {
             </h3>
             <p className="hero-desc">
               {enabled
-                ? `${status}. Native LOD, terrain, culling, shadows and render scale are untouched.`
-                : "FastTrack is paused and vanilla values are restored."}
+                ? `${status}. Adaptive Detail changes only the game's native LOD distance and restores it at close views.`
+                : "FastTrack is paused; any LOD adjustment is restored."}
             </p>
           </div>
           <div className="hero-status-right">
             <button
               className={`suite-primary-btn ${enabled ? "active-pulse" : ""}`}
               onClick={toggleEnabled}
-              title="Toggle visual-safe FastTrack features"
+              title="Pause monitoring and restore adaptive LOD"
             >
               {enabled ? "Pause" : "Enable"}
             </button>
           </div>
         </div>
 
-        {/* VISUAL SAFETY CONTRACT */}
+        {/* OPTIMIZATION */}
         <div className="section-header">
-          <span className="section-title">Visual Safety Contract</span>
-          <span className="section-subtitle">{visualMut} visual mutations</span>
+          <span className="section-title">Optimization</span>
+          <span className="section-subtitle">Opt-in · restored at close view</span>
         </div>
 
         <div className="presets-grid">
-          <div className="preset-card selected">
-            <div className="preset-icon">🛡</div>
+          <button type="button" aria-pressed={adaptiveLod} className={`preset-card ${adaptiveLod ? "selected" : ""}`} onClick={toggleAdaptiveLod}>
+            <div className="preset-icon">LOD</div>
             <div className="preset-info">
-              <div className="preset-name">Vanilla visuals locked</div>
-              <div className="preset-desc">No LOD, culling, terrain, shadow, decal, effect or HDRP buffer changes.</div>
+              <div className="preset-name">Adaptive Detail</div>
+              <div className="preset-desc">Reduces distant LOD at aerial camera heights. Full detail returns when you zoom in. Tune the maximum reduction in Options → FastTrack.</div>
             </div>
-            <span className="preset-check">✓</span>
-          </div>
-          <div className="preset-card selected">
-            <div className="preset-icon">⇧</div>
+            <span className="preset-check">{!enabled && adaptiveLod ? "PAUSED" : adaptiveLod ? (lodActive ? `ACTIVE ${Math.round(lodScale * 100)}%` : "ON") : "OFF"}</span>
+          </button>
+          <div className={`preset-card ${loadBoost ? "selected" : ""}`}>
+            <div className="preset-icon">LOAD</div>
             <div className="preset-info">
               <div className="preset-name">Experimental loading boost</div>
               <div className="preset-desc">Off by default. Opt in through Options → FastTrack. No speedup is guaranteed; leave off when diagnosing GPU problems.</div>
@@ -175,6 +185,7 @@ export const FastTrackPanel: React.FC = () => {
             <span className="preset-check">{loadBoost ? "ACTIVE" : loadBoostEnabled ? "READY" : "OFF"}</span>
           </div>
         </div>
+        <PerformanceComparison />
       </div>
 
       {/* FOOTER */}
@@ -187,7 +198,7 @@ export const FastTrackPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle deep frametime & thread telemetry"
         >
-          {showAdvanced ? "Hide Advanced ▴" : "Advanced ▸"}
+          {showAdvanced ? "Hide Advanced" : "Advanced"}
         </button>
       </div>
 
@@ -200,10 +211,9 @@ export const FastTrackPanel: React.FC = () => {
             <span>Draw Calls: <strong>{drawCalls.toLocaleString()}</strong></span>
           </div>
           <div className="drawer-telemetry">
-            <div>LOD and render scale: not controlled or measured by FastTrack.</div>
+            <div>Adaptive LOD: {lodActive ? `reduced to ${Math.round(lodScale * 100)}% of your current setting` : adaptiveLod ? "enabled; waiting for a distant view" : "off"}. Render scale stays game-controlled.</div>
             <div>Last city-load stage: {loadSecs > 0 ? `${loadSecs.toFixed(1)} s` : "Not measured"}</div>
-            <div>Safe Mode: {safeMode ? "Locked" : "FAULT"} • Visual Mutations: {visualMut}</div>
-            <div>Camera: {cameraState} (read-only) • Loading Boost: {loadBoost ? "Active" : "Inactive"}</div>
+            <div>Camera: {cameraState} | Loading Boost: {loadBoost ? "Active" : "Inactive"}</div>
             <div>Timing hint: {isGpuBound ? "GPU over target" : isCpuBound ? "Main thread over target" : "See sampled performance above"}. Not a proven cause.</div>
           </div>
         </div>

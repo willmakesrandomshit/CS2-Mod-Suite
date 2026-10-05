@@ -93,6 +93,7 @@ namespace MarkingStudio
             // Both must live in PrefabUpdate so PrefabSystem.UpdatePrefab fires NetInitializeSystem on the
             // same frame and the SecondaryNetLane buffers are baked before road geometry processes them.
             // See K2 / K4 in IMPLEMENTATION_PLAN.md.
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<EdgeLineCloneSystem>(SystemUpdatePhase.PrefabUpdate);
             updateSystem.UpdateAt<ParkingLineCloneSystem>(SystemUpdatePhase.PrefabUpdate);
 

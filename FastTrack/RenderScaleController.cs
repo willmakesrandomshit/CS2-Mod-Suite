@@ -4,10 +4,8 @@ using UnityEngine;
 namespace FastTrack
 {
     /// <summary>
-    /// Legacy-named frame-rate monitor. Since v1.3.4 this system is strictly
-    /// read-only: it measures FPS and publishes the visual-integrity contract.
-    /// It never changes LOD, render resolution, shadow settings, culling, decals
-    /// or any other scene state.
+    /// Legacy-named frame-rate monitor. It measures FPS; Adaptive Detail is
+    /// applied separately by CameraAwarenessSystem through the game LOD system.
     /// </summary>
     public sealed partial class RenderScaleController : GameSystemBase
     {
@@ -16,7 +14,6 @@ namespace FastTrack
         protected override void OnUpdate()
         {
             FastTrackRuntime.SyncSettings(Mod.Settings);
-            FastTrackRuntime.MaintainVisualContract();
 
             float delta = UnityEngine.Time.unscaledDeltaTime;
             if (delta <= 0f || delta > 1f) return;
@@ -37,7 +34,6 @@ namespace FastTrack
             if (World == null || !World.IsCreated) return;
             base.OnGamePreload(purpose, mode);
             m_Elapsed = 0f;
-            FastTrackRuntime.MaintainVisualContract();
         }
 
         protected override void OnDestroy()

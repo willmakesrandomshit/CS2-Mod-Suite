@@ -28,6 +28,7 @@ namespace EventEngine
 
             AssetDatabase.global.LoadSettings(nameof(EventEngine), setting, defaults);
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<EventEngineSystem>(SystemUpdatePhase.GameSimulation);
             log.Info("[EventEngine] System registered: EventEngineSystem (GameSimulation)");
 

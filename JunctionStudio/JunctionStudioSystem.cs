@@ -28,6 +28,14 @@ namespace JunctionStudio
         private ValueBinding<string> _message;
         private ValueBinding<bool> _panelOpen;
         private string _lastMessage = "Select a junction with Town Road Lane.";
+        private JunctionPreset _pendingPreset;
+        private Entity _pendingNode;
+        private List<Entity> _pendingApproaches;
+        private JunctionPreset _previousPreset;
+        private Entity _previousNode;
+        private List<Entity> _previousApproaches;
+        private ValueBinding<bool> _previewArmed;
+        private ValueBinding<bool> _canRestorePrevious;
 
         private static string LibraryPath => Path.Combine(
             Application.persistentDataPath, "ModsData", "JunctionStudio", "presets.xml");
@@ -48,13 +56,20 @@ namespace JunctionStudio
             AddBinding(_presets);
             AddBinding(_message);
             AddBinding(_panelOpen);
+            _previewArmed = new ValueBinding<bool>(Group, "previewArmed", false);
+            _canRestorePrevious = new ValueBinding<bool>(Group, "canRestorePrevious", false);
+            AddBinding(_previewArmed);
+            AddBinding(_canRestorePrevious);
+            AddBinding(new TriggerBinding(Group, "confirmApply", ConfirmApply));
+            AddBinding(new TriggerBinding(Group, "cancelPreview", CancelPreview));
+            AddBinding(new TriggerBinding(Group, "restorePrevious", RestorePrevious));
             AddBinding(new TriggerBinding(Group, "copy", Copy));
             AddBinding(new TriggerBinding(Group, "paste", Paste));
             AddBinding(new TriggerBinding<string>(Group, "savePreset", SavePreset, ValueReaders.Create<string>()));
             AddBinding(new TriggerBinding<string>(Group, "applyPreset", ApplyPreset, ValueReaders.Create<string>()));
             AddBinding(new TriggerBinding<string>(Group, "deletePreset", DeletePreset, ValueReaders.Create<string>()));
-            AddBinding(new TriggerBinding(Group, "togglePanel", () => _panelOpen.Update(!_panelOpen.value)));
-            AddBinding(new TriggerBinding(Group, "closePanel", () => _panelOpen.Update(false)));
+            AddBinding(new TriggerBinding(Group, "togglePanel", () => { if (_panelOpen.value) CancelPreview(); _panelOpen.Update(!_panelOpen.value); }));
+            AddBinding(new TriggerBinding(Group, "closePanel", () => { CancelPreview(); _panelOpen.Update(false); }));
             Publish();
         }
 
@@ -63,6 +78,8 @@ namespace JunctionStudio
             if (World == null || !World.IsCreated) return;
             base.OnGamePreload(purpose, mode);
             _clipboard = null;
+            _pendingPreset = _previousPreset = null;
+            _pendingApproaches = _previousApproaches = null;
             _lastMessage = "Select a junction with Town Road Lane.";
             _panelOpen?.Update(false);
             Publish();
@@ -72,6 +89,7 @@ namespace JunctionStudio
         {
             if (World == null || !World.IsCreated) return;
             base.OnUpdate();
+            if (_pendingPreset != null && SelectedNode != _pendingNode) CancelPreview();
             Publish();
         }
 
@@ -91,6 +109,8 @@ namespace JunctionStudio
             _hasClipboard.Update(_clipboard != null);
             _presets.Update(string.Join("\n", _library.Presets.Select(x => x.Name).OrderBy(x => x, StringComparer.OrdinalIgnoreCase)));
             _message.Update(_lastMessage);
+            _previewArmed.Update(_pendingPreset != null);
+            _canRestorePrevious.Update(_previousPreset != null && SelectedNode == _previousNode && EntityManager.Exists(_previousNode));
         }
 
         private void Copy()
@@ -154,7 +174,12 @@ namespace JunctionStudio
             {
                 foreach (MarkingLine line in EntityManager.GetBuffer<MarkingLine>(node, true))
                 {
-                    if (!edgeIndex.TryGetValue(line.sourceEdge, out int a) || !edgeIndex.TryGetValue(line.targetEdge, out int b)) continue;
+                    if (!edgeIndex.TryGetValue(line.sourceEdge, out int a) || !edgeIndex.TryGetValue(line.targetEdge, out int b))
+                    {
+                        _lastMessage = "A marking references an unsupported approach. Capture was cancelled without changing the junction.";
+                        preset = null;
+                        return false;
+                    }
                     preset.Lines.Add(new LineRecord { SourceApproach = a, SourceGap = line.sourceGapIndex, TargetApproach = b, TargetGap = line.targetGapIndex, Style = line.style, Curvature = line.curvature });
                 }
             }
@@ -184,7 +209,7 @@ namespace JunctionStudio
             return true;
         }
 
-        private void Apply(JunctionPreset preset)
+        private void Apply(JunctionPreset preset, bool confirmed = false)
         {
             Entity node = SelectedNode;
             if (!TryGetApproaches(node, out List<Entity> approaches, out float baseline, out float3 centre))
@@ -205,7 +230,21 @@ namespace JunctionStudio
                 return;
             }
 
-            TryCapture("Automatic rollback", out JunctionPreset rollback);
+            if (!confirmed)
+            {
+                _pendingPreset = preset;
+                _pendingNode = node;
+                _pendingApproaches = approaches;
+                _lastMessage = $"Preview ‘{preset.Name}’: replace markings with {preset.Lines.Count} lines and {preset.Areas.Count} areas across {approaches.Count} approaches. Nothing changed yet.";
+                Publish();
+                return;
+            }
+            if (!TryCapture("Previous markings", out JunctionPreset rollback) || !ValidatePreset(rollback, approaches.Count, out validationError))
+            {
+                _lastMessage = "Cannot safely capture the current markings. No changes were made.";
+                Publish();
+                return;
+            }
 
             try
             {
@@ -225,7 +264,49 @@ namespace JunctionStudio
             }
 
             _lastMessage = $"Applied ‘{preset.Name}’: {preset.Lines.Count} lines, {preset.Areas.Count} areas.";
+            _previousPreset = rollback;
+            _previousNode = node;
+            _previousApproaches = approaches;
             Publish();
+        }
+
+        private void CancelPreview()
+        {
+            if (_pendingPreset != null) _lastMessage = "Preview cancelled; markings unchanged.";
+            _pendingPreset = null;
+            _pendingApproaches = null;
+            Publish();
+        }
+
+        private void ConfirmApply()
+        {
+            if (_pendingPreset == null) return;
+            if (SelectedNode != _pendingNode || !TryGetApproaches(_pendingNode, out var approaches, out _, out _) ||
+                !approaches.SequenceEqual(_pendingApproaches))
+            {
+                CancelPreview();
+                _lastMessage = "Junction changed; select the preset again.";
+                Publish();
+                return;
+            }
+            var preset = _pendingPreset;
+            _pendingPreset = null;
+            _pendingApproaches = null;
+            Apply(preset, confirmed: true);
+        }
+
+        private void RestorePrevious()
+        {
+            if (_previousPreset == null || SelectedNode != _previousNode) return;
+            if (!TryGetApproaches(_previousNode, out var approaches, out _, out _) || !approaches.SequenceEqual(_previousApproaches))
+            {
+                _lastMessage = "Junction topology changed; the saved markings cannot safely be restored.";
+                Publish();
+                return;
+            }
+            CancelPreview();
+            var previous = _previousPreset;
+            Apply(previous, confirmed: true);
         }
 
         private void WritePresetToNode(Entity node, JunctionPreset preset, List<Entity> approaches, float baseline, float3 centre)

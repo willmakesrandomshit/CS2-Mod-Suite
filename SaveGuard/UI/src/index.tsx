@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useState, useEffect, useCallback } from 'react';
 import { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -27,10 +28,10 @@ const selTimestampBinding = bindValue<string>('SaveGuard', 'selTimestamp', '-');
 const selHealthBinding = bindValue<string>('SaveGuard', 'selHealth', '-');
 const selTypeBinding = bindValue<string>('SaveGuard', 'selType', '-');
 
-const diagSummaryBinding = bindValue<string>('SaveGuard', 'diagSummary', 'Save file integrity validated');
-const diagCategoryBinding = bindValue<string>('SaveGuard', 'diagCategory', 'Healthy');
-const diagActionBinding = bindValue<string>('SaveGuard', 'diagAction', 'No action needed');
-const diagIntegrityBinding = bindValue<string>('SaveGuard', 'diagIntegrity', '100%');
+const diagSummaryBinding = bindValue<string>('SaveGuard', 'diagSummary', 'Select a save to inspect its archive structure.');
+const diagCategoryBinding = bindValue<string>('SaveGuard', 'diagCategory', 'Not checked');
+const diagActionBinding = bindValue<string>('SaveGuard', 'diagAction', 'Select a save to see the recommended action.');
+const diagIntegrityBinding = bindValue<string>('SaveGuard', 'diagIntegrity', 'Not checked');
 const diagIsCorruptedBinding = bindValue<boolean>('SaveGuard', 'diagIsCorrupted', false);
 const testRecoveryResultBinding = bindValue<string>('SaveGuard', 'testRecoveryResult', '');
 
@@ -69,6 +70,7 @@ const parseTimeline = (raw: unknown): SaveTimelineItem[] => {
     }));
 };
 
+const portfolioBindings = { "panelOpen": openBinding, "saveCount": saveCountBinding, "selSizeMb": selSizeMbBinding, "diagIsCorrupted": diagIsCorruptedBinding };
 export const SaveGuardToolbarButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(openBinding.value);
 
@@ -113,7 +115,7 @@ export const SaveGuardPanel: React.FC = () => {
 
   const [timelineRaw, setTimelineRaw] = useState<unknown>(timelineBinding.value ?? []);
   const [confirmRestoreItem, setConfirmRestoreItem] = useState<SaveTimelineItem | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("SaveGuard.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -154,6 +156,7 @@ export const SaveGuardPanel: React.FC = () => {
   }, []);
 
   const timeline = parseTimeline(timelineRaw);
+  const hasSelectedSave = selFileName !== 'None' && selFileName !== 'No save selected' && selFileName.trim().length > 0;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -196,7 +199,7 @@ export const SaveGuardPanel: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="suite-panel saveguard-panel" role="dialog" aria-label="SaveGuard Panel">
+    <div className="suite-panel saveguard-panel" data-portfolio-panel role="dialog" aria-label="SaveGuard Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -207,30 +210,33 @@ export const SaveGuardPanel: React.FC = () => {
           </div>
         </div>
         <div className="header-right">
-          <span className={`suite-badge ${diagIsCorrupted ? 'status-problem' : 'status-good'}`}>
-            {diagIsCorrupted ? 'Warning' : 'Ready'}
+          <span className={`suite-badge ${diagIsCorrupted ? 'status-problem' : hasSelectedSave ? 'status-good' : 'status-neutral'}`}>
+            {diagIsCorrupted ? 'Warning' : hasSelectedSave ? 'Checked' : 'Select a save'}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.SaveGuard"} name={"SaveGuard"} version={"1.2.4-beta.1"} steps={["Select the disposable save you want to protect.", "Create a restore point before changing the city.", "Restore into a separate copy and verify that copy loads."]} note={"A successful backup does not guarantee recovery. Keep an independent copy of valuable saves."} bindings={portfolioBindings} />
       <div className="suite-body">
         {/* HERO STATUS CARD */}
         <div className="hero-status-card">
           <div className="hero-status-left">
             <span className="hero-label">SAVE FILE HEALTH</span>
-            <h3 className={`hero-title ${diagIsCorrupted ? 'status-problem' : 'status-good'}`}>
-              {diagIsCorrupted ? 'Issues Detected' : 'Selected Save Check'}
+            <h3 className={`hero-title ${diagIsCorrupted ? 'status-problem' : hasSelectedSave ? 'status-good' : 'status-neutral'}`}>
+              {diagIsCorrupted ? 'Issues Detected' : hasSelectedSave ? 'Selected Save Check' : 'No save selected'}
             </h3>
             <p className="hero-desc">
-              {diagSummary || 'Select a save to inspect its archive structure, then create a manual restore point if needed.'}
+              {hasSelectedSave
+                ? diagSummary || 'The selected save has not produced a diagnostic summary yet.'
+                : 'Choose a save or restore point to inspect its archive structure. SaveGuard will report a result after it checks the file.'}
             </p>
           </div>
           <div className="hero-status-right">
@@ -253,7 +259,6 @@ export const SaveGuardPanel: React.FC = () => {
         <div className="timeline-list">
           {timeline.length === 0 ? (
             <div className="empty-timeline-box">
-              <span className="empty-icon">💾</span>
               <p>No extra restore points found yet. Click <strong>Create Restore Point</strong> above to make a safety snapshot.</p>
             </div>
           ) : (
@@ -266,13 +271,13 @@ export const SaveGuardPanel: React.FC = () => {
                 <div className="timeline-info">
                   <div className="timeline-top">
                     <span className="timeline-name">{item.cityName || item.fileName}</span>
-                    <span className={`timeline-badge ${item.health === 'Healthy' ? 'good' : 'warning'}`}>
+                    <span className={`timeline-badge ${item.health.toLowerCase() === 'healthy' ? 'good' : 'warning'}`}>
                       {item.saveType || 'Autosave'}
                     </span>
                   </div>
                   <div className="timeline-meta">
                     <span>{item.timestamp || 'Recent'}</span>
-                    <span>•</span>
+                    <span>|</span>
                     <span>{item.sizeMb ? `${item.sizeMb.toFixed(1)} MB` : 'Validated'}</span>
                   </div>
                 </div>
@@ -299,7 +304,7 @@ export const SaveGuardPanel: React.FC = () => {
       {confirmRestoreItem && (
         <div className="suite-modal-overlay">
           <div className="suite-modal-box">
-            <div className="modal-icon">⚠️</div>
+            <div className="modal-icon">CONFIRM</div>
             <h3 className="modal-title">Create a Restored Copy?</h3>
             <p className="modal-desc">
               SaveGuard will copy <strong>{confirmRestoreItem.fileName}</strong> into the CS2 Saves folder with a new <strong>_RESTORED_</strong> filename. It will not overwrite the source or load the copy automatically.
@@ -330,7 +335,7 @@ export const SaveGuardPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle diagnostic telemetry"
         >
-          {showAdvanced ? 'Hide Advanced ▴' : 'Advanced ▸'}
+          {showAdvanced ? 'Hide Advanced' : 'Advanced'}
         </button>
       </div>
 
@@ -385,7 +390,7 @@ class SaveGuardPanelBoundary extends React.Component<React.PropsWithChildren<{}>
       <div className="suite-panel saveguard-panel" role="alert">
         <div className="suite-header">
           <div className="header-left"><h2 className="header-title">SaveGuard</h2></div>
-          <button className="suite-close-btn" onClick={() => trigger('SaveGuard', 'closePanel')} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={() => trigger('SaveGuard', 'closePanel')} title="Close Panel" aria-label="Close panel">×</button>
         </div>
         <div className="suite-body">
           <div className="empty-timeline-box">

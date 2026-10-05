@@ -25,6 +25,7 @@
     <Reference Include="Unity.Entities"><Private>false</Private></Reference>
     <Reference Include="Unity.Collections"><Private>false</Private></Reference>
     <Reference Include="Unity.Mathematics"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><Private>false</Private></Reference>
   </ItemGroup>
   <Target Name="BuildUI" BeforeTargets="BeforeBuild">
     <Exec WorkingDirectory="UI" Command="npm run build" />
@@ -32,8 +33,10 @@
   <Target Name="DeployDiscordRPCFiles" AfterTargets="DeployWIP">
     <ItemGroup>
       <DiscordRPCFiles Include="UI\dist\DiscordRPC.mjs;UI\mod.json" />
+      <DiscordRPCImages Include="UI\dist\images\**\*" />
     </ItemGroup>
     <Copy SourceFiles="@(DiscordRPCFiles)" DestinationFolder="$(DeployDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DiscordRPCImages)" DestinationFiles="@(DiscordRPCImages->'$(DeployDir)\images\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
   <Target Name="CleanEmptyBurstOutputs" AfterTargets="DeployWIP;DeployDiscordRPCFiles">
     <!-- DiscordRPC contains no Burst jobs. Do not ship the toolchain's empty native

@@ -29,6 +29,7 @@ namespace ContourPlus
             GameManager.instance.localizationManager.AddSource("en-US", new LocaleEN(SettingInstance));
             AssetDatabase.global.LoadSettings(nameof(ContourPlus), SettingInstance, defaults);
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<TopographySystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAt<ContourOverlaySystem>(SystemUpdatePhase.Rendering);
             updateSystem.UpdateAt<ContourPlusUISystem>(SystemUpdatePhase.UIUpdate);

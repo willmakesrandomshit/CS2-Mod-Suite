@@ -14,7 +14,7 @@ substitute for the outstanding in-game runtime matrices noted below.
 
 | Project | Classification | PDX ID / baseline | Source version | Purpose | Important current limitation | Licence |
 |---|---|---:|---:|---|---|---|
-| FastTrack | Public source ready | 155229 / 1.3.4 | 1.3.5-beta.1 | Read-only performance monitoring and optional loading-budget experiment | No guaranteed FPS gain; extended runtime regression is pending | MIT |
+| FastTrack | Public source ready | 155229 / 1.3.4 | 1.3.5-beta.2 | Adaptive native LOD at distant camera heights plus performance monitoring | Opt-in LOD implementation builds; in-game visual and performance regression is pending | MIT |
 | RoadRules | Public source ready | 155436 / 1.4.4 | 1.4.5-beta.1 | Physical-lane access, preferences and closures | Selective class and overlay matrix remains partially verified; some rules are soft preferences | MIT |
 | SaveGuard | Public source ready | 155424 / 1.2.3 | 1.2.4-beta.1 | Restore points and restored copies | Recovery is never guaranteed; restored-copy load coverage is incomplete | MIT |
 | TrafficStressLab | Public source ready | 155230 / 1.5.4 | 1.5.5-beta.1 | Additional bounded native road-trip requests | High multipliers are experimental; requests are not guaranteed visible vehicles | MIT |

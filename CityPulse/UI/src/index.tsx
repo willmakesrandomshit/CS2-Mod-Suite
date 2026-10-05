@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -39,6 +40,7 @@ interface CityAlert {
 
 const visibleBinding = bindValue<boolean>('cityPulse', 'visible', false);
 
+const portfolioBindings = { "visible": visibleBinding };
 export const CityPulseToolbarButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(visibleBinding.value);
 
@@ -65,17 +67,17 @@ export const CityPulsePanel: React.FC = () => {
   const [visible, setVisible] = useState<boolean>(visibleBinding.value);
   const [activeTab, setActiveTab] = useState<'overview' | 'traffic' | 'transit' | 'parking' | 'services' | 'buildings' | 'network'>('overview');
   const [selectedAlert, setSelectedAlert] = useState<CityAlert | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("CityPulse.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [overview, setOverview] = useState<MasterOverview>({
-    masterCityHealthScore: 100,
-    trafficHealthScore: 100,
-    transitHealthScore: 100,
-    parkingHealthScore: 100,
-    serviceHealthScore: 100,
-    buildingHealthScore: 100,
-    networkHealthScore: 100,
+    masterCityHealthScore: 0,
+    trafficHealthScore: 0,
+    transitHealthScore: 0,
+    parkingHealthScore: 0,
+    serviceHealthScore: 0,
+    buildingHealthScore: 0,
+    networkHealthScore: 0,
     criticalAlertCount: 0,
     warningAlertCount: 0,
     advisoryAlertCount: 0,
@@ -84,19 +86,19 @@ export const CityPulsePanel: React.FC = () => {
   });
 
   const [alerts, setAlerts] = useState<CityAlert[]>([]);
-  const [trafficSummary, setTrafficSummary] = useState<any>({ cityHealthScore: 100, activeVehicles: 0, averageCitySpeedKph: 45, congestionIndex: 0, bottleneckCount: 0 });
+  const [trafficSummary, setTrafficSummary] = useState<any>({ cityHealthScore: 0, activeVehicles: 0, averageCitySpeedKph: 0, congestionIndex: 0, bottleneckCount: 0 });
   const [trafficBottlenecks, setTrafficBottlenecks] = useState<any[]>([]);
-  const [transitSummary, setTransitSummary] = useState<any>({ totalLines: 0, activeVehicles: 0, totalPassengers: 0, totalWaiting: 0, avgUtilization: 0, overcrowdedCount: 0, bunchingCount: 0, healthScore: 100 });
+  const [transitSummary, setTransitSummary] = useState<any>({ totalLines: 0, activeVehicles: 0, totalPassengers: 0, totalWaiting: 0, avgUtilization: 0, overcrowdedCount: 0, bunchingCount: 0, healthScore: 0 });
   const [transitLines, setTransitLines] = useState<any[]>([]);
   const [transitStops, setTransitStops] = useState<any[]>([]);
-  const [parkingSummary, setParkingSummary] = useState<any>({ totalOffStreetSpaces: 0, totalParkedCars: 0, networkUtilizationPercent: 0, fullFacilitiesCount: 0, underutilizedCount: 0, totalFacilities: 0, healthScore: 100 });
+  const [parkingSummary, setParkingSummary] = useState<any>({ totalOffStreetSpaces: 0, totalParkedCars: 0, networkUtilizationPercent: 0, fullFacilitiesCount: 0, underutilizedCount: 0, totalFacilities: 0, healthScore: 0 });
   const [parkingFacilities, setParkingFacilities] = useState<any[]>([]);
-  const [serviceSummary, setServiceSummary] = useState<any>({ totalFacilities: 0, criticalCount: 0, warningCount: 0, optimalCount: 0, averageEfficiency: 100, healthScore: 100 });
+  const [serviceSummary, setServiceSummary] = useState<any>({ totalFacilities: 0, criticalCount: 0, warningCount: 0, optimalCount: 0, averageEfficiency: 0, healthScore: 0 });
   const [serviceFacilities, setServiceFacilities] = useState<any[]>([]);
-  const [buildingSummary, setBuildingSummary] = useState<any>({ totalBuildingsScanned: 0, troubledCount: 0, workerShortageCount: 0, lowEfficiencyCount: 0, abandonedCount: 0, healthScore: 100 });
+  const [buildingSummary, setBuildingSummary] = useState<any>({ totalBuildingsScanned: 0, troubledCount: 0, workerShortageCount: 0, lowEfficiencyCount: 0, abandonedCount: 0, healthScore: 0 });
   const [buildingIssues, setBuildingIssues] = useState<any[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<any>(null);
-  const [networkSummary, setNetworkSummary] = useState<any>({ totalSegments: 0, scannedSegments: 0, criticalCount: 0, errorCount: 0, warningCount: 0, infoCount: 0, healthScore: 100, lastStatus: 'Ready', undoCount: 0 });
+  const [networkSummary, setNetworkSummary] = useState<any>({ totalSegments: 0, scannedSegments: 0, criticalCount: 0, errorCount: 0, warningCount: 0, infoCount: 0, healthScore: 0, lastStatus: 'Waiting for first scan', undoCount: 0 });
   const [networkDefects, setNetworkDefects] = useState<any[]>([]);
 
   const showToast = (msg: string) => {
@@ -153,13 +155,17 @@ export const CityPulsePanel: React.FC = () => {
 
   if (!visible) return null;
 
+  const overviewReady = overview.masterCityHealthScore > 0;
+
   const getStatusText = (score: number) => {
+    if (!overviewReady) return 'SCANNING';
     if (score >= 80) return 'GOOD';
     if (score >= 60) return 'WATCH';
     return 'PROBLEM';
   };
 
   const getStatusClass = (score: number) => {
+    if (!overviewReady) return 'status-waiting';
     if (score >= 80) return 'status-good';
     if (score >= 60) return 'status-watch';
     return 'status-problem';
@@ -168,7 +174,7 @@ export const CityPulsePanel: React.FC = () => {
   const masterStatus = getStatusText(overview.masterCityHealthScore);
 
   return (
-    <div className="suite-panel city-pulse-panel" role="dialog" aria-label="City Pulse Diagnostic Suite">
+    <div className="suite-panel city-pulse-panel" data-portfolio-panel role="dialog" aria-label="City Pulse Diagnostic Suite">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -180,21 +186,27 @@ export const CityPulsePanel: React.FC = () => {
         </div>
         <div className="header-right">
           <span className={`suite-badge ${getStatusClass(overview.masterCityHealthScore)}`}>
-            {overview.masterCityHealthScore}% • {masterStatus}
+            {overviewReady ? `${overview.masterCityHealthScore}% / ${masterStatus}` : 'SCANNING'}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {!overviewReady && (
+        <div className="suite-banner scanning">
+          City scan starting. Initial values are withheld until the first sample is ready.
         </div>
       )}
 
       {overview.legacyModDetected && (
         <div className="suite-banner warning">
-          <span>⚠️ {overview.legacyModWarningMessage}</span>
+          <span>Legacy mod detected: {overview.legacyModWarningMessage}</span>
         </div>
       )}
 
@@ -252,6 +264,7 @@ export const CityPulsePanel: React.FC = () => {
       </nav>
 
       {/* BODY CONTENT AREA */}
+      <PortfolioHelp runtimeGroup={"Portfolio.CityPulse"} name={"City Pulse"} version={"3.0.4-beta.1"} steps={["Wait for a city scan, then choose a diagnostic category.", "Select an alert and compare its measured evidence with the inferred cause.", "Use the location action to inspect the affected area."]} note={"Scores and inferred causes are diagnostic clues, not proof."} bindings={portfolioBindings} />
       <div className="suite-body">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
@@ -261,10 +274,12 @@ export const CityPulsePanel: React.FC = () => {
               <div className="health-left">
                 <span className="health-label">HEURISTIC CITY SUMMARY</span>
                 <h1 className={`health-status-title ${getStatusClass(overview.masterCityHealthScore)}`}>
-                  {masterStatus === 'GOOD' ? 'Few sampled warning signs' : masterStatus === 'WATCH' ? 'Review sampled warnings' : 'Review priority observations'}
+                  {!overviewReady ? 'Scanning city data' : masterStatus === 'GOOD' ? 'Few sampled warning signs' : masterStatus === 'WATCH' ? 'Review sampled warnings' : 'Review priority observations'}
                 </h1>
                 <p className="health-desc">
-                  Scores summarize limited samples using heuristics; they are not a complete city diagnosis or proof of a cause. Building scans finish in batches. Inspect the measured evidence below.
+                  {!overviewReady
+                    ? 'The first scan is starting. Health scores and alerts will appear after City Pulse has sampled the city.'
+                    : 'Scores summarize limited samples using heuristics; they are not a complete city diagnosis or proof of a cause. Building scans finish in batches. Inspect the measured evidence below.'}
                 </p>
               </div>
               <div className="health-right">
@@ -276,7 +291,7 @@ export const CityPulsePanel: React.FC = () => {
             <div className="domain-grid">
               <div className="domain-card" onClick={() => setActiveTab('traffic')} title="Click to view Traffic details">
                 <div className="domain-header">
-                  <span className="domain-name">🚗 Traffic</span>
+                  <span className="domain-name">Traffic</span>
                   <span className={`domain-badge ${getStatusClass(overview.trafficHealthScore)}`}>{getStatusText(overview.trafficHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.trafficHealthScore}%</div>
@@ -285,7 +300,7 @@ export const CityPulsePanel: React.FC = () => {
 
               <div className="domain-card" onClick={() => setActiveTab('transit')} title="Click to view Transit details">
                 <div className="domain-header">
-                  <span className="domain-name">🚌 Transit</span>
+                  <span className="domain-name">Transit</span>
                   <span className={`domain-badge ${getStatusClass(overview.transitHealthScore)}`}>{getStatusText(overview.transitHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.transitHealthScore}%</div>
@@ -294,7 +309,7 @@ export const CityPulsePanel: React.FC = () => {
 
               <div className="domain-card" onClick={() => setActiveTab('parking')} title="Click to view Parking details">
                 <div className="domain-header">
-                  <span className="domain-name">🅿️ Parking</span>
+                  <span className="domain-name">Parking</span>
                   <span className={`domain-badge ${getStatusClass(overview.parkingHealthScore)}`}>{getStatusText(overview.parkingHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.parkingHealthScore}%</div>
@@ -303,7 +318,7 @@ export const CityPulsePanel: React.FC = () => {
 
               <div className="domain-card" onClick={() => setActiveTab('services')} title="Click to view Services details">
                 <div className="domain-header">
-                  <span className="domain-name">🏥 Services</span>
+                  <span className="domain-name">Services</span>
                   <span className={`domain-badge ${getStatusClass(overview.serviceHealthScore)}`}>{getStatusText(overview.serviceHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.serviceHealthScore}%</div>
@@ -312,7 +327,7 @@ export const CityPulsePanel: React.FC = () => {
 
               <div className="domain-card" onClick={() => setActiveTab('buildings')} title="Click to view Buildings details">
                 <div className="domain-header">
-                  <span className="domain-name">🏢 Buildings</span>
+                  <span className="domain-name">Buildings</span>
                   <span className={`domain-badge ${getStatusClass(overview.buildingHealthScore)}`}>{getStatusText(overview.buildingHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.buildingHealthScore}%</div>
@@ -321,7 +336,7 @@ export const CityPulsePanel: React.FC = () => {
 
               <div className="domain-card" onClick={() => setActiveTab('network')} title="Click to view Road Network details">
                 <div className="domain-header">
-                  <span className="domain-name">🛣️ Roads</span>
+                  <span className="domain-name">Roads</span>
                   <span className={`domain-badge ${getStatusClass(overview.networkHealthScore)}`}>{getStatusText(overview.networkHealthScore)}</span>
                 </div>
                 <div className="domain-metric">{overview.networkHealthScore}%</div>
@@ -335,9 +350,13 @@ export const CityPulsePanel: React.FC = () => {
               <span className="section-count">{alerts.length} Total</span>
             </div>
 
-            {alerts.length === 0 ? (
+            {!overviewReady ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">✓</div>
+                <h3>Waiting for the first scan</h3>
+                <p>Priority alerts will be reported here after City Pulse samples the city.</p>
+              </div>
+            ) : alerts.length === 0 ? (
+              <div className="suite-empty-state">
                 <h3>No Current Priority Alerts</h3>
                 <p>No supported critical traffic, service, or network issue patterns are currently reported.</p>
               </div>
@@ -420,7 +439,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {trafficBottlenecks.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🚗</div>
                 <h3>No Vanilla Bottleneck Markers Found</h3>
                 <p>No active CS2 bottleneck markers were present when City Pulse sampled the city.</p>
               </div>
@@ -430,7 +448,7 @@ export const CityPulsePanel: React.FC = () => {
                   <div className="item-row" key={idx}>
                     <div className="item-info">
                       <div className="item-name">{b.locationName || `Lane #${b.entityIndex}`}</div>
-                      <div className="item-desc">{b.severity} • Marker persistence: {b.queuePressurePercent}%</div>
+                      <div className="item-desc">{b.severity} | Marker persistence: {b.queuePressurePercent}%</div>
                     </div>
                     <button
                       className="suite-primary-btn compact"
@@ -470,7 +488,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {transitLines.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🚌</div>
                 <h3>No Transit Lines Active</h3>
                 <p>Create bus, tram, subway, or train lines to view transit performance.</p>
               </div>
@@ -480,7 +497,7 @@ export const CityPulsePanel: React.FC = () => {
                   <div className="item-row" key={idx}>
                     <div className="item-info">
                       <div className="item-name">{l.name || `Line #${l.entityIndex}`}</div>
-                      <div className="item-desc">{l.vehicleCount} vehicles • {l.passengers} passengers • {l.utilizationPercent}% measured load</div>
+                      <div className="item-desc">{l.vehicleCount} vehicles | {l.passengers} passengers | {l.utilizationPercent}% measured load</div>
                     </div>
                     <button
                       className="suite-secondary-btn compact"
@@ -520,7 +537,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {parkingFacilities.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🅿️</div>
                 <h3>No Parking Facilities Found</h3>
                 <p>Build parking lots or garages to inspect off-street capacity.</p>
               </div>
@@ -570,7 +586,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {serviceFacilities.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🏥</div>
                 <h3>No Service Facilities Found</h3>
                 <p>Build health, police, fire, education, or garbage services to view diagnostics.</p>
               </div>
@@ -580,7 +595,7 @@ export const CityPulsePanel: React.FC = () => {
                   <div className="item-row" key={idx}>
                     <div className="item-info">
                       <div className="item-name">{s.name || `Service Facility #${s.entityIndex}`}</div>
-                      <div className="item-desc">Efficiency: {s.efficiencyPercent}% • Status: {s.status}</div>
+                      <div className="item-desc">Efficiency: {s.efficiencyPercent}% | Status: {s.status}</div>
                     </div>
                     <button
                       className="suite-primary-btn compact"
@@ -620,7 +635,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {buildingIssues.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🏢</div>
                 <h3>No Tracked Building Issues</h3>
                 <p>No abandonment, major vacancy, or low-efficiency signals were present in this scan.</p>
               </div>
@@ -630,7 +644,7 @@ export const CityPulsePanel: React.FC = () => {
                   <div className="item-row" key={idx}>
                     <div className="item-info">
                       <div className="item-name">{b.buildingName || `Building #${b.entityIndex}`}</div>
-                      <div className="item-desc">{b.primaryIssue} • {b.measuredEvidence}</div>
+                      <div className="item-desc">{b.primaryIssue} | {b.measuredEvidence}</div>
                     </div>
                     <button
                       className="suite-primary-btn compact"
@@ -669,7 +683,6 @@ export const CityPulsePanel: React.FC = () => {
 
             {networkDefects.length === 0 ? (
               <div className="suite-empty-state">
-                <div className="empty-icon">🛣️</div>
                 <h3>No Invalid Curves in the Sample</h3>
                 <p>This check only detects non-finite or zero-length lane curves; it is not a full network integrity guarantee.</p>
               </div>
@@ -679,7 +692,7 @@ export const CityPulsePanel: React.FC = () => {
                   <div className="item-row" key={d.id}>
                     <div className="item-info">
                       <div className="item-name">{d.title}</div>
-                      <div className="item-desc">{d.whatWeFound} • {d.evidence}</div>
+                      <div className="item-desc">{d.whatWeFound} | {d.evidence}</div>
                     </div>
                     <div className="item-actions">
                       <button
@@ -700,13 +713,13 @@ export const CityPulsePanel: React.FC = () => {
 
       {/* FOOTER */}
       <div className="suite-footer">
-        <span className="footer-hint">City Pulse v3.0 • Continuous Diagnostics</span>
+        <span className="footer-hint">City Pulse v3.0 | Continuous Diagnostics</span>
         <button
           className="advanced-toggle-btn"
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle diagnostic telemetry details"
         >
-          {showAdvanced ? 'Hide Advanced ▴' : 'Advanced ▸'}
+          {showAdvanced ? 'Hide Advanced' : 'Advanced'}
         </button>
       </div>
 

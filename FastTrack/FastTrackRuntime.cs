@@ -1,16 +1,14 @@
 using System;
+using Game;
+using Game.Rendering;
+using Game.SceneFlow;
+using Unity.Entities;
 using UnityEngine;
 
 namespace FastTrack
 {
     /// <summary>
-    /// Central runtime state for FastTrack's visual-safe feature set.
-    ///
-    /// VISUAL CONTRACT:
-    /// FastTrack never writes LOD bias, shadow distance/cascades, pixel-light
-    /// count, reflection, particle, decal, render-scale, culling or HDRP state.
-    /// Only the temporary city-loading upload budget is changed, and it is
-    /// restored as soon as loading completes.
+    /// Central runtime state for FastTrack's opt-in adaptive detail feature.
     /// </summary>
     internal static class FastTrackRuntime
     {
@@ -24,14 +22,25 @@ namespace FastTrack
         private static int    s_AppliedTimeSlice;
         private static int    s_AppliedBufferSize;
 
+        // Adaptive detail writes only the game's own runtime LOD multiplier.
+        // The native user setting is not modified or saved.
+        private static RenderingSystem s_RenderingSystem;
+        private static bool   s_LodBaselineCaptured;
+        private static bool   s_LodWriteActive;
+        private static bool   s_LodOptimizationFaulted;
+        private static float  s_LodBaseline;
+        private static float  s_LastAppliedLod;
+
+        private const float k_StockLowLod = 0.25f;
+
         // ── state ──────────────────────────────────────────────────────────
         public static bool   Enabled             { get; private set; } = true;
-        public static bool   SafeMode            { get; private set; } = true;
         public static bool   LoadingBoostActive  { get; private set; }
-        public static int    VisualMutationCount => 0;
+        public static bool   AdaptiveLodActive   { get; private set; }
 
         // performance signals (written by PerformanceProfilerSystem each second)
         public static float  AverageFps          { get; set; }
+        public static int    SampleSequence      { get; set; }
         public static float  LastLoadSeconds      { get; set; }
         public static float  MainThreadMs         { get; set; }
         public static float  RenderThreadMs       { get; set; }
@@ -47,13 +56,13 @@ namespace FastTrack
         // camera state (written by CameraAwarenessSystem)
         public static CameraState CameraState     { get; set; } = CameraState.Overview;
         public static float       CameraAltitude  { get; set; }
+        public static bool        CameraMoving    { get; set; }
 
-        // Legacy telemetry retained for UI/binding compatibility. Visual
-        // mutation systems were removed in v1.3.4 and these remain zero/false.
+        // Legacy telemetry retained for UI/binding compatibility.
         public static int    ShadowThrottledCount { get; private set; }
         public static bool   DecalOptimizeActive  { get; private set; }
 
-        // Contract telemetry: native values are never changed.
+        // Runtime telemetry for the adaptive LOD multiplier.
         public static float  LodScale             { get; private set; } = 1f;
         public static float  RenderScale          { get; private set; } = 1f;
 
@@ -64,7 +73,7 @@ namespace FastTrack
             s_Initialized = true;
             Enabled       = true;
             SyncSettings(Mod.Settings);
-            MaintainVisualContract();
+            RefreshStatus();
         }
 
         // ── loading optimization ──────────────────────────────────────────
@@ -124,17 +133,138 @@ namespace FastTrack
             }
         }
 
-        /// <summary>
-        /// Publish and assert FastTrack's no-visual-mutation contract. This method
-        /// intentionally performs no Unity/HDRP writes.
-        /// </summary>
-        public static void MaintainVisualContract()
+        /// <summary>Apply camera-aware LOD using the game's native rendering setting.</summary>
+        public static void UpdateAdaptiveLod(CameraState cameraState)
         {
-            LodScale = 1f;
-            RenderScale = 1f;
             ShadowThrottledCount = 0;
             DecalOptimizeActive = false;
-            Status = s_LoadingOptimizationFaulted ? "Loading boost faulted — restart CS2" : Enabled ? "Read-only visual monitoring" : "FastTrack paused";
+
+            var settings = Mod.Settings;
+            var manager = GameManager.instance;
+            if (!Enabled || settings?.AdaptiveLodEnabled != true || manager == null || !manager.gameMode.IsGame() || manager.isGameLoading)
+            {
+                RestoreAdaptiveLod();
+                RefreshStatus();
+                return;
+            }
+
+            try
+            {
+                var currentRenderingSystem = World.DefaultGameObjectInjectionWorld?.GetExistingSystemManaged<RenderingSystem>();
+                if (currentRenderingSystem == null)
+                {
+                    RefreshStatus();
+                    return;
+                }
+
+                if (!ReferenceEquals(currentRenderingSystem, s_RenderingSystem))
+                {
+                    RestoreAdaptiveLod();
+                    s_RenderingSystem = currentRenderingSystem;
+                    s_LodBaseline = currentRenderingSystem.levelOfDetail;
+                    s_LodBaselineCaptured = true;
+                    s_LodOptimizationFaulted = false;
+                    Mod.Log.Info($"Adaptive LOD attached to game RenderingSystem; native LOD={s_LodBaseline:F3}.");
+                }
+
+                if (!s_LodBaselineCaptured || s_LodOptimizationFaulted) { RefreshStatus(); return; }
+
+                float current = s_RenderingSystem.levelOfDetail;
+                if (s_LodWriteActive && !Mathf.Approximately(current, s_LastAppliedLod))
+                {
+                    // The user, game, or another mod changed the native setting.
+                    // Treat that new value as the baseline before adapting again.
+                    s_LodBaseline = current;
+                    s_LodWriteActive = false;
+                    Mod.Log.Info($"Adaptive LOD rebased to external game value {s_LodBaseline:F3}.");
+                }
+                else if (!s_LodWriteActive)
+                {
+                    // Keep the baseline aligned with changes made while the
+                    // optimization is inactive or at a full-detail view.
+                    s_LodBaseline = current;
+                }
+
+                float reduction = Mathf.Clamp(settings.AdaptiveLodReductionPercent, 10, 40) / 100f;
+                float altitudeStrength = cameraState == CameraState.UltraAerial ? 1f
+                    : cameraState == CameraState.Aerial ? 0.5f
+                    : 0f;
+                float target = s_LodBaseline;
+                if (altitudeStrength > 0f && s_LodBaseline > 0f)
+                {
+                    float adapted = s_LodBaseline * (1f - reduction * altitudeStrength);
+                    float lodFloor = Mathf.Min(s_LodBaseline, k_StockLowLod);
+                    target = Mathf.Max(lodFloor, adapted);
+                }
+
+                if (!Mathf.Approximately(current, target))
+                {
+                    s_RenderingSystem.levelOfDetail = target;
+                    s_LastAppliedLod = target;
+                    s_LodWriteActive = !Mathf.Approximately(target, s_LodBaseline);
+                    Mod.Log.Info($"Adaptive LOD applied: camera={cameraState}, native={s_LodBaseline:F3}, runtime={target:F3}.");
+                }
+                else if (Mathf.Approximately(target, s_LodBaseline))
+                {
+                    s_LodWriteActive = false;
+                }
+
+                AdaptiveLodActive = s_LodWriteActive;
+                LodScale = s_LodBaseline > 0f ? target / s_LodBaseline : 1f;
+            }
+            catch (Exception ex)
+            {
+                s_LodOptimizationFaulted = true;
+                Mod.Log.Error(ex, "Adaptive LOD failed. FastTrack is restoring the native value and disabling this optimization for the current session.");
+                RestoreAdaptiveLod();
+            }
+
+            RefreshStatus();
+        }
+
+        public static void RestoreAdaptiveLod()
+        {
+            if (s_LodWriteActive && s_RenderingSystem != null)
+            {
+                try
+                {
+                    // Restore only if our last value is still present. This avoids
+                    // overwriting an intervening change by the game or another mod.
+                    if (Mathf.Approximately(s_RenderingSystem.levelOfDetail, s_LastAppliedLod))
+                    {
+                        s_RenderingSystem.levelOfDetail = s_LodBaseline;
+                        Mod.Log.Info($"Adaptive LOD restored native value {s_LodBaseline:F3}.");
+                    }
+                    else
+                    {
+                        Mod.Log.Info("Adaptive LOD left an external LOD change untouched during restore.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    s_LodOptimizationFaulted = true;
+                    Mod.Log.Error(ex, "Failed to restore native LOD. Reopen FastTrack after returning to the city to retry.");
+                }
+            }
+
+            s_LodWriteActive = false;
+            AdaptiveLodActive = false;
+            LodScale = 1f;
+        }
+
+        private static void RefreshStatus()
+        {
+            Status = s_LoadingOptimizationFaulted
+                ? "Loading boost faulted — restart CS2"
+                : s_LodOptimizationFaulted
+                    ? "Adaptive Detail failed — native setting restored"
+                    : !Enabled
+                        ? "FastTrack paused"
+                        : AdaptiveLodActive
+                            ? $"Adaptive detail active · LOD {LodScale:P0}"
+                            : Mod.Settings?.AdaptiveLodEnabled == true
+                                ? "Adaptive Detail on · full detail at this view"
+                                : "Monitoring · Adaptive Detail off";
         }
 
         // ── settings sync ─────────────────────────────────────────────────
@@ -142,8 +272,8 @@ namespace FastTrack
         {
             if (settings == null) return;
             Enabled = settings.Enabled;
-            SafeMode = true;
-            MaintainVisualContract();
+            if (!Enabled || !settings.AdaptiveLodEnabled) RestoreAdaptiveLod();
+            RefreshStatus();
             if (!Enabled || !settings.ExperimentalLoadingBoost || !settings.DebugLoadingGroup) EndLoadingBoost();
         }
 
@@ -151,7 +281,7 @@ namespace FastTrack
         {
             Enabled = true;
             if (Mod.Settings != null) { Mod.Settings.Enabled = true; Mod.Settings.ApplyAndSave(); }
-            MaintainVisualContract();
+            RefreshStatus();
         }
 
         /// <summary>
@@ -176,6 +306,9 @@ namespace FastTrack
             AverageFps = LastLoadSeconds = MainThreadMs = RenderThreadMs = GpuFrameMs = 0f;
             GcBytesPerFrame = DrawCalls = SetPassCalls = 0;
             IsGpuBound = IsCpuBound = false;
+            AdaptiveLodActive = false;
+            LodScale = 1f;
+            RenderScale = 1f;
             Bottleneck = "Measuring";
         }
 
@@ -187,6 +320,9 @@ namespace FastTrack
         public static void Dispose()
         {
             RestoreVanilla();
+            s_RenderingSystem = null;
+            s_LodBaselineCaptured = false;
+            s_LodOptimizationFaulted = false;
             s_Initialized = false;
             ResetTelemetry();
         }
@@ -200,8 +336,9 @@ namespace FastTrack
         {
             if (!s_Initialized) return;
             EndLoadingBoost();
+            RestoreAdaptiveLod();
             Enabled  = false;
-            MaintainVisualContract();
+            RefreshStatus();
         }
     }
 

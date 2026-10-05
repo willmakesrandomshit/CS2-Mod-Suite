@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import type { ModRegistrar } from "cs2/modding";
 import { bindValue, trigger } from "cs2/api";
@@ -44,6 +45,7 @@ const safe = <T,>(raw: string, fallback: T): T => {
   }
 };
 
+const portfolioBindings = { "open": open, "showButton": show, "errors": errors, "warnings": warnings, "mods": mods, "duplicates": duplicates };
 export const CrashLensToolbarButton: React.FC = () => {
   const isOpen = useB(open);
   const showBtn = useB(show);
@@ -76,7 +78,7 @@ export const CrashLensPanel: React.FC = () => {
   const path = useB(reportPath);
 
   const [selectedSuspect, setSelectedSuspect] = useState<Suspect | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("CrashLens.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -86,7 +88,36 @@ export const CrashLensPanel: React.FC = () => {
 
   const list = useMemo(() => safe<Suspect[]>(rawS, []), [rawS]);
   const events = useMemo(() => safe<string[]>(rawA, []), [rawA]);
-  const isHealthy = h === "Healthy" && list.length === 0;
+  // "No evidence found" is a completed, limited scan, not proof that the
+  // installed mods are healthy. Keep it neutral and distinguish it from the
+  // initial scan so an empty list never reads as a false all-clear.
+  const isScanning = h === "Scanning";
+  const hasNoSupportedPatterns = h === "No evidence found" && list.length === 0;
+  const statusClass = isScanning || hasNoSupportedPatterns
+    ? "status-neutral"
+    : h === "Watch"
+      ? "status-warning"
+      : h === "Action recommended" || h === "Needs attention"
+        ? "status-problem"
+        : "status-neutral";
+  const statusLabel = isScanning
+    ? "Scanning"
+    : hasNoSupportedPatterns
+      ? "Scan complete"
+      : list.length === 1
+        ? "1 Lead"
+        : `${list.length} Leads`;
+  const statusTitle = isScanning
+    ? "Scanning log files"
+    : hasNoSupportedPatterns
+      ? "No Supported Patterns Found"
+      : h === "Action recommended"
+        ? `${list.length} Leads to Review`
+        : h === "Needs attention"
+          ? "Errors Found — Review Leads"
+          : h === "Watch"
+            ? "Warnings Found — Review Leads"
+            : `${list.length} Leads Found`;
 
   const close = useCallback(() => trigger("crashLens", "close"), []);
 
@@ -115,7 +146,7 @@ export const CrashLensPanel: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="suite-panel crashlens-panel" role="dialog" aria-label="CrashLens Panel">
+    <div className="suite-panel crashlens-panel" data-portfolio-panel role="dialog" aria-label="CrashLens Panel">
       {/* PANEL HEADER */}
       <div className="suite-header">
         <div className="header-left">
@@ -126,32 +157,35 @@ export const CrashLensPanel: React.FC = () => {
           </div>
         </div>
         <div className="header-right">
-          <span className={`suite-badge ${isHealthy ? 'status-good' : 'status-problem'}`}>
-            {isHealthy ? 'No Leads' : `${list.length} Leads`}
+          <span className={`suite-badge ${statusClass}`}>
+            {statusLabel}
           </span>
-          <button className="suite-close-btn" onClick={close} title="Close Panel">✕</button>
+          <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
       </div>
 
       {toastMessage && (
         <div className="suite-toast">
-          <span>✓ {toastMessage}</span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* PANEL BODY */}
+      <PortfolioHelp runtimeGroup={"Portfolio.CrashLens"} name={"CrashLens"} version={"1.1.4-beta.1"} steps={["Wait for the log scan to finish.", "Review each lead and its supporting evidence.", "Export a report when reporting an issue."]} note={"A suspect ranking does not prove which mod caused an error. Review exported logs before sharing."} bindings={portfolioBindings} />
       <div className="suite-body">
         {/* HERO STATUS CARD */}
         <div className="hero-status-card">
           <div className="hero-status-left">
             <span className="hero-label">STABILITY DIAGNOSTICS</span>
-            <h3 className={`hero-title ${isHealthy ? 'status-good' : 'status-problem'}`}>
-              {isHealthy ? 'No Supported Issue Patterns Found' : `${list.length} Leads Found`}
+            <h3 className={`hero-title ${statusClass}`}>
+              {statusTitle}
             </h3>
             <p className="hero-desc">
-              {isHealthy
-                ? `CrashLens found no supported error patterns in the logs it scanned. This is not proof that every mod is healthy.`
-                : `${e} errors and ${w} warnings were recorded. Review the evidence-ranked leads below; a lead is not automatic proof.`}
+              {isScanning
+                ? sum || 'The first log scan is still in progress.'
+                : hasNoSupportedPatterns
+                  ? `${sum}. This limited scan is not proof that every mod is healthy.`
+                  : `${e} errors and ${w} warnings were recorded. Review the evidence-ranked leads below; a lead is not automatic proof.`}
             </p>
           </div>
           <div className="hero-status-right">
@@ -174,9 +208,10 @@ export const CrashLensPanel: React.FC = () => {
         <div className="problems-list">
           {list.length === 0 ? (
             <div className="clean-status-box">
-              <span className="clean-icon">🛡️</span>
-              <h4>No Leads From This Scan</h4>
-              <p>No supported crash patterns, missing dependencies, or duplicate assemblies were identified in the scanned logs.</p>
+              <h4>{isScanning ? 'Scan in progress' : 'No leads from this scan'}</h4>
+              <p>{isScanning
+                ? 'CrashLens is sampling the available log files. Results will appear here when the scan finishes.'
+                : 'No supported error patterns were identified in the scanned log sections. This is a limited check, not a guarantee that every mod is healthy.'}</p>
             </div>
           ) : (
             list.map((item, idx) => (
@@ -187,15 +222,15 @@ export const CrashLensPanel: React.FC = () => {
               >
                 <div className="problem-header">
                   <span className="problem-tag">
-                    {item.confidence === 'High' ? '🔴 Mod Error' : '🟡 Warning'}
+                    {item.confidence === 'High' ? 'Mod error' : 'Warning'}
                   </span>
                   <span className="problem-mod-name">{item.name}</span>
                 </div>
                 <p className="problem-reason">{item.reason || 'Unhandled exception in mod execution loop'}</p>
                 <div className="problem-footer">
-                  <span>{item.errors} errors • {item.warnings} warnings</span>
+                  <span>{item.errors} errors | {item.warnings} warnings</span>
                   <span className="problem-details-btn">
-                    {selectedSuspect?.name === item.name ? 'Hide Details ▴' : 'View Details ▸'}
+                    {selectedSuspect?.name === item.name ? 'Hide Details' : 'View Details'}
                   </span>
                 </div>
 
@@ -243,7 +278,7 @@ export const CrashLensPanel: React.FC = () => {
           onClick={() => setShowAdvanced(!showAdvanced)}
           title="Toggle raw activity stream"
         >
-          {showAdvanced ? 'Hide Details ▴' : 'Technical Details ▸'}
+          {showAdvanced ? 'Hide Details' : 'Technical Details'}
         </button>
       </div>
 
@@ -261,7 +296,7 @@ export const CrashLensPanel: React.FC = () => {
             ) : (
               events.slice(0, 5).map((ev, i) => (
                 <div key={i} style={{ fontSize: '10px', marginTop: '2px', color: '#94a3b8' }}>
-                  • {ev}
+                  - {ev}
                 </div>
               ))
             )}

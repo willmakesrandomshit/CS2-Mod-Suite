@@ -1,3 +1,4 @@
+import { PortfolioHelp, useRememberedPreference } from "./portfolio-ux";
 import React, { useEffect, useState } from 'react';
 import { ModRegistrar } from 'cs2/modding';
 import { bindValue, trigger } from 'cs2/api';
@@ -25,6 +26,7 @@ function useBinding<T>(binding: any): T {
   return value;
 }
 
+const portfolioBindings = { "open": open$, "toolActive": active$, "hasSelection": selected$, "roadSelection": roadSelection$, "remoteSelection": remoteSelection$, "hasOverride": hasOverride$ };
 const ToolbarButton: React.FC = () => {
   const open = useBinding<boolean>(open$);
   const active = useBinding<boolean>(active$);
@@ -47,7 +49,7 @@ const ProbePanel: React.FC = () => {
   const hasOverride = useBinding<boolean>(hasOverride$);
   const pocStatus = useBinding<string>(pocStatus$);
   const pocTelemetry = useBinding<string>(pocTelemetry$);
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useRememberedPreference("AccessStudio.showAdvanced", false);
 
   useEffect(() => {
     if (!open) return;
@@ -60,12 +62,13 @@ const ProbePanel: React.FC = () => {
 
   if (!open) return null;
   return (
-    <section className="as-panel">
+    <section className="as-panel" data-portfolio-panel>
       <header>
         <div><strong>Access Studio</strong><small>PUBLIC EARLY ALPHA</small></div>
         <button aria-label="Close" onClick={() => trigger('AccessStudio', 'close')}>×</button>
       </header>
       <div className={`as-state ${active ? 'active' : ''}`}>{active ? 'SELECT A BUILDING' : 'PROBE PAUSED'}</div>
+      <PortfolioHelp runtimeGroup={"Portfolio.AccessStudio"} name={"Access Studio"} version={"0.3.3-alpha.1"} steps={["Activate the probe and select a supported building.", "Choose Move Service Access and pick a valid road.", "Use Reset Vanilla to restore the original access."]} note={"Remote access is experimental. Verify service routing in a disposable city."} bindings={portfolioBindings} />
       <p className="as-status">{status}</p>
       <div className="as-actions">
         <button onClick={() => trigger('AccessStudio', 'activate')}>{active ? 'Selection Tool Active' : 'Select Building'}</button>

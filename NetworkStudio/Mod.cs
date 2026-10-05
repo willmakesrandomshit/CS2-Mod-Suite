@@ -25,6 +25,7 @@ namespace NetworkStudio
 
             AssetDatabase.global.LoadSettings(nameof(NetworkStudio), setting, new NetworkStudioSetting(this));
 
+            updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<NetworkStudioSystem>(SystemUpdatePhase.GameSimulation);
             log.Info("[NetworkStudio] System registered: NetworkStudioSystem (GameSimulation)");
 

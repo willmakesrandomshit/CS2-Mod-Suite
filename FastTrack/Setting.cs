@@ -24,8 +24,7 @@ namespace FastTrack
         [SettingsUISection(kMain, kCore)]
         public bool Enabled { get; set; }
 
-        [SettingsUISection(kMain, kCore)]
-        [SettingsUIDisableByCondition(typeof(FastTrackSetting), nameof(IsSafeModeLocked))]
+        [SettingsUIHidden]
         public bool SafeMode { get; set; }
 
         // Retained only so older settings files deserialize cleanly. Presets no
@@ -54,6 +53,13 @@ namespace FastTrack
         // ── removed visual features (hidden compatibility fields) ─────────
         [SettingsUIHidden]
         public bool AdaptiveVisuals { get; set; }
+
+        [SettingsUISection(kMain, kQualityScale)]
+        public bool AdaptiveLodEnabled { get; set; }
+
+        [SettingsUISlider(min = 10, max = 40, step = 5)]
+        [SettingsUISection(kMain, kQualityScale)]
+        public int AdaptiveLodReductionPercent { get; set; }
 
         [SettingsUIHidden]
         public bool AdaptiveResolution { get; set; }
@@ -102,6 +108,8 @@ namespace FastTrack
             OptimizeAsyncUpload        = false;
             ExperimentalLoadingBoost   = false;
             AdaptiveVisuals            = false;
+            AdaptiveLodEnabled         = false;
+            AdaptiveLodReductionPercent = 25;
             AdaptiveResolution         = false;
             ReduceExpensiveEffects     = false;
             DebugProfilerGroup         = true;
@@ -112,13 +120,12 @@ namespace FastTrack
             DiagnosticsLogging         = false;
         }
 
-        public bool IsSafeModeLocked() => true;
-
         /// <summary>
-        /// Migrates persisted v1.3.3 settings to the vanilla-visual contract.
+        /// Retires legacy visual mutations. Adaptive LOD is new, explicit opt-in
+        /// functionality and is not inherited from legacy settings.
         /// Returns true when values changed and should be saved.
         /// </summary>
-        public bool EnforceVisualContract()
+        public bool MigrateLegacySettings()
         {
             bool changed = !SafeMode
                 || ThrottleDistantShadows
@@ -145,7 +152,7 @@ namespace FastTrack
         public override void Apply()
         {
             base.Apply();
-            EnforceVisualContract();
+            MigrateLegacySettings();
             FastTrackRuntime.OnSettingsChanged();
         }
     }
@@ -169,9 +176,9 @@ namespace FastTrack
 
             // Core
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.Enabled)),             "Enable FastTrack" },
-            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.Enabled)),              "Enables performance monitoring and optional experimental loading-budget tuning. Does not speed up simulation or change save data." },
-            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.SafeMode)),            "Vanilla visual contract" },
-            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.SafeMode)),             "Locked on. FastTrack cannot change LOD, terrain, culling, shadows, decals, effects, render scale, or world visibility." },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.Enabled)),              "Enables performance monitoring and user-selected adaptive LOD. It does not change simulation logic or save data." },
+            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.SafeMode)),            "Legacy compatibility mode" },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.SafeMode)),             "Retained for older settings files. Adaptive Detail is controlled separately." },
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.Preset)),              "Optimization preset" },
             { s.GetOptionDescLocaleID(nameof(FastTrackSetting.Preset)),               "Legacy setting. Visual-quality presets have been removed." },
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.TargetFps)),           "Target FPS" },
@@ -188,8 +195,12 @@ namespace FastTrack
             { s.GetOptionDescLocaleID(nameof(FastTrackSetting.ExperimentalLoadingBoost)),  "Optionally raises Unity's async upload budget only during city loading, then restores captured values. Leave off if diagnosing GPU or loading instability." },
 
             // Quality scalers
-            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.AdaptiveVisuals)),     "Adaptive distance detail (LOD)" },
-            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.AdaptiveVisuals)),      "Removed in v1.3.4. FastTrack no longer changes global LOD or shadow distance." },
+            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.AdaptiveVisuals)),     "Legacy adaptive visuals" },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.AdaptiveVisuals)),      "Retired compatibility setting. Use Adaptive Detail below." },
+            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.AdaptiveLodEnabled)), "Adaptive Detail (LOD)" },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.AdaptiveLodEnabled)),  "When enabled, lowers the game's native LOD distance only at distant camera heights and restores the current LOD when zoomed in. This trades some distant detail for rendering work." },
+            { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.AdaptiveLodReductionPercent)), "Maximum distant LOD reduction" },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.AdaptiveLodReductionPercent)), "Maximum reduction at the highest camera altitude. It is halved at medium altitude and never raises or lowers LOD beyond the game's stock Low value or your existing lower setting." },
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.AdaptiveResolution)),  "Adaptive render resolution (disabled)" },
             { s.GetOptionDescLocaleID(nameof(FastTrackSetting.AdaptiveResolution)),   "Retained for settings compatibility but intentionally disabled. Runtime buffer resizing is unsafe with Cities: Skylines II's HDRP custom passes." },
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.ReduceExpensiveEffects)), "Reduce effects under extreme pressure" },
@@ -203,7 +214,7 @@ namespace FastTrack
 
             // Recovery
             { s.GetOptionLabelLocaleID(nameof(FastTrackSetting.RestoreVanilla)),      "Stop and restore vanilla" },
-            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.RestoreVanilla)),       "Pauses monitoring and restores an active loading-budget experiment. FastTrack does not write visual-quality or HDRP settings." },
+            { s.GetOptionDescLocaleID(nameof(FastTrackSetting.RestoreVanilla)),       "Pauses FastTrack and restores any adaptive LOD or loading-budget changes." },
 
             // Preset enum
             { s.GetEnumValueLocaleID(OptimizationPreset.Quality),      "Quality"      },
