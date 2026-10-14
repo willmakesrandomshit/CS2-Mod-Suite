@@ -12,6 +12,10 @@ const open = bindValue<boolean>("trafficStressTester", "panelOpen", false);
 const show = bindValue<boolean>("trafficStressTester", "showButton", true);
 const generated = bindValue<number>("trafficStressTester", "generated", 0);
 const ramp = bindValue<string>("trafficStressTester", "ramp", "Fast");
+const readyRoutes = bindValue<number>("trafficStressTester", "readyRoutes", 0);
+const roadVehicles = bindValue<number>("trafficStressTester", "roadVehicles", 0);
+const batchLimit = bindValue<number>("trafficStressTester", "batchLimit", 0);
+const limited = bindValue<boolean>("trafficStressTester", "limited", false);
 
 function useB<T>(b: { value: T; subscribe(c: (v: T) => void): { value: T; dispose(): void } }): T {
   const [v, set] = useState<T>(b.value);
@@ -24,14 +28,14 @@ function useB<T>(b: { value: T; subscribe(c: (v: T) => void): { value: T; dispos
 }
 
 const INTENSITY_LEVELS = [
-  { value: 1, label: "Vanilla", desc: "Stop extra request generation (1x)" },
-  { value: 2, label: "Light", desc: "Generate additional requests at the 2x setting" },
-  { value: 5, label: "Heavy", desc: "Generate additional requests at the 5x setting" },
-  { value: 10, label: "Extreme", desc: "Generate additional requests at the 10x setting" },
-  { value: 25, label: "Gridlock Stress", desc: "Aggressive 25x request pressure with a larger bounded queue" },
+  { value: 1, label: "Vanilla", desc: "Stop extra departures (1x)" },
+  { value: 2, label: "Light", desc: "Add one departure for each approved road route" },
+  { value: 5, label: "Heavy", desc: "Add four departures for each approved road route" },
+  { value: 10, label: "Extreme", desc: "Add nine departures for each approved road route" },
+  { value: 25, label: "Gridlock Stress", desc: "Add 24 departures for each approved road route, within the batch cap" },
 ];
 
-const portfolioBindings = { "multiplier": mult, "enabled": enabled, "panelOpen": open, "showButton": show, "generated": generated };
+const portfolioBindings = { "multiplier": mult, "enabled": enabled, "panelOpen": open, "showButton": show, "generated": generated, "readyRoutes": readyRoutes, "roadVehicles": roadVehicles, "batchLimit": batchLimit, "limited": limited };
 export const TrafficStressToolbarButton: React.FC = () => {
   const visible = useB(show);
   const isOpen = useB(open);
@@ -55,6 +59,10 @@ export const TrafficStressPanel: React.FC = () => {
   const visible = useB(open);
   const count = useB(generated);
   const speed = useB(ramp);
+  const routes = useB(readyRoutes);
+  const vehicles = useB(roadVehicles);
+  const cap = useB(batchLimit);
+  const atCap = useB(limited);
 
   const [selectedIntensity, setSelectedIntensity] = useState<number>(m > 1 ? m : 2);
   const [showAdvanced, setShowAdvanced] = useRememberedPreference("TrafficStressLab.showAdvanced", false);
@@ -83,12 +91,13 @@ export const TrafficStressPanel: React.FC = () => {
     const target = val !== undefined ? val : selectedIntensity;
     trigger("trafficStressTester", "setMultiplier", target);
     const item = INTENSITY_LEVELS.find((s) => s.value === target);
-    showToast(`Request multiplier set to ${item?.label || target} (${target}x)`);
+    setSelectedIntensity(target);
+    showToast(`Departure setting: ${item?.label || target} (${target}x)`);
   };
 
   const stopTest = () => {
     trigger("trafficStressTester", "reset");
-    showToast("Stopped new extra requests; queued requests and existing vehicles will finish normally");
+    showToast("Stopped extra departures; vehicles already spawned finish their trips");
   };
 
   if (!visible) return null;
@@ -101,12 +110,12 @@ export const TrafficStressPanel: React.FC = () => {
           <img src={iconSrc} alt="Traffic Stress Lab" className="header-icon" />
           <div>
             <h2 className="header-title">Traffic Stress Lab</h2>
-            <span className="header-subtitle">Additional Traffic-Request Tester</span>
+            <span className="header-subtitle">Road Traffic Stress Tester</span>
           </div>
         </div>
         <div className="header-right">
           <span className={`suite-badge ${isRunning ? "status-watch" : "status-good"}`}>
-            {isRunning ? `${m}x Requests` : "No Extra Requests"}
+            {isRunning ? `${m}x Departures` : "Vanilla Departures"}
           </span>
           <button className="suite-close-btn" onClick={close} title="Close Panel" aria-label="Close panel">×</button>
         </div>
@@ -119,7 +128,7 @@ export const TrafficStressPanel: React.FC = () => {
       )}
 
       {/* PANEL BODY */}
-      <PortfolioHelp runtimeGroup={"Portfolio.TrafficStressTester"} name={"Traffic Stress Lab"} version={"1.5.5-beta.1"} steps={["Use a disposable city and start with Light pressure.", "Watch request counts and actual traffic separately.", "Stop the test to stop generating new extra requests."]} note={"Queued requests and existing vehicles finish normally after stopping. Requests are not guaranteed visible vehicles."} bindings={portfolioBindings} />
+      <PortfolioHelp runtimeGroup={"Portfolio.TrafficStressTester"} name={"Traffic Stress Lab"} version={"1.5.7-beta.1"} steps={["Use a disposable city and start with Light pressure.", "Watch road vehicles and extra departures separately.", "Stop the test to return to vanilla departures."]} note={"Amplifies approved random road routes. Roads outside those routes may stay quiet; existing vehicles finish their trips."} bindings={portfolioBindings} />
       <div className="suite-body">
         {isRunning ? (
           /* RUNNING TEST VIEW */
@@ -129,28 +138,36 @@ export const TrafficStressPanel: React.FC = () => {
               <span className="running-title">TRAFFIC TEST RUNNING</span>
             </div>
             <h2 className="running-intensity-name">
-              {currentScenario.label} ({m}x Request Setting)
+              {currentScenario.label}
             </h2>
             <p className="running-desc">
-              Submitting additional random-traffic requests to CS2's normal dispatcher. The setting is not a guaranteed vehicle-count multiplier; spawning still depends on the city and dispatcher.
+              {`${m}x departures on approved random road routes. CS2 creates and routes the vehicles; this changes departures rather than the total cars in the city.`}
             </p>
             <div className="running-stats-row">
               <div className="stat-box">
-                <span className="stat-label">EXTRA REQUESTS SUBMITTED</span>
+                <span className="stat-label">EXTRA DEPARTURES QUEUED</span>
                 <span className="stat-value">{count.toLocaleString()}</span>
               </div>
               <div className="stat-box">
-                <span className="stat-label">DISPATCH RAMP</span>
-                <span className="stat-value">{speed}</span>
+                <span className="stat-label">ROAD VEHICLES</span>
+                <span className="stat-value">{vehicles.toLocaleString()}</span>
               </div>
             </div>
             <button
               className="suite-danger-btn large"
               onClick={stopTest}
-              title="Stop generating new extra requests; already queued requests and vehicles continue normally"
+              title="Stop extra departures; vehicles already spawned finish their trips"
             >
-              Stop New Requests
+              Stop Extra Departures
             </button>
+            <p className="running-desc batch-status">
+              {routes === 0 ? "Waiting for the next approved road route." : atCap ? `Batch cap reached (${cap} extra departures). Increase the cap in Options for more pressure.` : `${routes} approved route(s) in the last batch. Ramp: ${speed}.`}
+            </p>
+            <div className="running-preset-row">
+              {INTENSITY_LEVELS.filter((item) => item.value > 1).map((item) => (
+                <button key={item.value} className={`intensity-card ${m === item.value ? "selected" : ""}`} onClick={() => startTest(item.value)} title={item.desc}>{`${item.value}x`}</button>
+              ))}
+            </div>
           </div>
         ) : (
           /* IDLE TEST CONFIGURATION */
@@ -194,7 +211,7 @@ export const TrafficStressPanel: React.FC = () => {
       {/* FOOTER */}
       <div className="suite-footer">
         <span className="footer-hint">
-          {isRunning ? `Submitting requests at the ${m}x setting` : "Ready — no extra requests are being generated"}
+          {isRunning ? `Amplifying road departures at ${m}x` : "Ready — vanilla departures"}
         </span>
         <button
           className="advanced-toggle-btn"
@@ -214,7 +231,9 @@ export const TrafficStressPanel: React.FC = () => {
           </div>
           <div className="drawer-telemetry">
             <div>Vanilla Traffic Baseline: 1.0x</div>
-            <div>Extra Requests Submitted: {count.toLocaleString()}</div>
+            <div>Extra Departures Queued: {count.toLocaleString()}</div>
+            <div>Last Batch: {routes} approved routes · cap {cap}</div>
+            <div>Road Vehicles Observed: {vehicles.toLocaleString()}</div>
           </div>
           <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
             <button

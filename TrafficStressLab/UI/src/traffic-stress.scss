@@ -137,6 +137,8 @@
       }
 
       .running-intensity-name {
+        display: block;
+        width: 100%;
         font-size: 18px;
         font-weight: 700;
         color: #ffffff;
@@ -163,6 +165,22 @@
 
           .stat-label { font-size: 10px; font-weight: 700; color: #64748b; display: block; }
           .stat-value { font-size: 14px; font-weight: 700; color: #f1f5f9; }
+        }
+      }
+      .batch-status { margin: 10px 0; }
+      .running-preset-row {
+        display: flex;
+        justify-content: space-between;
+        button {
+          flex: 1;
+          margin: 0 3px;
+          padding: 6px;
+          background: #293e4c;
+          border: 1px solid #617785;
+          border-radius: 3px;
+          color: #edf2f5;
+          cursor: pointer;
+          &.selected { background: #38647b; border-color: #9bcfe6; }
         }
       }
     }

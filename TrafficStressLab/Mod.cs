@@ -16,7 +16,7 @@ namespace TrafficStressTester
 
         public void OnLoad(UpdateSystem updateSystem)
         {
-            Log.Info("Traffic Stress Lab v1.5.5-beta.1 BETA loaded");
+            Log.Info("Traffic Stress Lab v1.5.7-beta.1 BETA loaded");
             // ModSetting registers its instance by mod ID in its constructor.
             // Construct defaults first so the UI resolves the live settings object.
             var defaults = new TrafficStressSetting(this);
@@ -29,7 +29,7 @@ namespace TrafficStressTester
                 Log.Info($"Traffic Stress Lab asset location: {asset.path}");
 
             updateSystem.UpdateAt<PortfolioSupportUISystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<TrafficStressSystem>(SystemUpdatePhase.GameSimulation);
+            updateSystem.UpdateBefore<TrafficStressSystem, Game.Simulation.TrafficSpawnerAISystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAt<TrafficStressUISystem>(SystemUpdatePhase.UIUpdate);
 
             // Register with SuiteBridge
@@ -42,7 +42,7 @@ namespace TrafficStressTester
                 }
             });
 
-            Log.Info("Traffic Stress Lab v1.5.5-beta.1 BETA loaded successfully.");
+            Log.Info("Traffic Stress Lab v1.5.7-beta.1 BETA loaded successfully.");
         }
 
         public void OnDispose()

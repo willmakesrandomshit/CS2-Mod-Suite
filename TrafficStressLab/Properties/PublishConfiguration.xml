@@ -6,21 +6,21 @@
   <LongDescription><![CDATA[BETA / EXPERIMENTAL — use a test city.
 
 WHAT IT DOES
-Multiplies native random-road-traffic requests and sustains bounded additional request batches. Extra Trips counts submitted requests, not guaranteed visible vehicles.
+Amplifies already-approved random road departures at 2x, 5x, 10x or 25x. Native CS2 spawning, vehicle selection and routing handle each departure. It does not multiply every commuter or service trip.
 
 HOW TO USE
-Open TSL, choose 2x, 5x, 10x or 25x/Gridlock to start a test. Select 1x or Stop / Reset to stop generation.
+Open TSL, choose a preset, then Start Test. Switch presets while running or Stop Extra Departures to return to vanilla generation. Options controls ramp speed and the extra departures per batch cap.
 
 CURRENT LIMITATIONS
-Stop/Reset cancels outstanding test-clone requests on the next simulation tick; vehicles already dispatched continue normally. Pause must be released for simulation cleanup to run. Vanilla pathfinding/dispatch determines visible traffic. Higher multipliers can hurt performance and are not fully runtime verified.]]></LongDescription>
+Through-traffic follows native approved routes; roads outside those routes can remain quiet. The cap can limit effective pressure and the panel reports this. Extra Departures Queued counts approved spawning entries; Road Vehicles counts current road vehicle entities, not confirmed TSL-created cars. A higher departure rate is not a guaranteed total vehicle-count multiplier. Existing cars finish normally after stopping. Current amplification has build/offline checks; in-game density and compatibility validation remains pending.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
-  <ModVersion Value="1.5.5-beta.1" />
+  <ModVersion Value="1.5.7-beta.1" />
   <GameVersion Value="1.6.*" />
   <RequiredDLC Value="" />
-  <ChangeLog><![CDATA[1.5.5-beta.1 — Maintenance beta
+  <ChangeLog><![CDATA[1.5.7-beta.1 — Approved departure amplification
 
-Stop/Reset and 1x now signal cancellation of queued test requests. Honor city-transition reset settings. Harden request counters and per-update queue limits; dispose command buffers reliably.
+Replace cloned random-traffic requests rejected by native per-spawner ownership validation with bounded amplification of approved ServiceDispatch entries immediately before native spawning. Match native spawn cadence and retain target/path checks. Report road vehicles, ready routes and cap pressure; allow live preset switching.
 
-Build/offline checks do not establish full in-game verification.]]></ChangeLog>
+Debug/Release/UI and offline regression checks are recorded in docs/traffic-stress-qa-2026-10-14.md. In-game validation remains pending.]]></ChangeLog>
   <AccessLevel Value="Public" />
 </Publish>
