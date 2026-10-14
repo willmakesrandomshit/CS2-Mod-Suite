@@ -12,7 +12,7 @@ FEATURES
 • Custom Details and State templates with readable tokens.
 • Session timer and activity preview.
 • Connection diagnostics, manual refresh and automatic reconnect attempts.
-• Companion activity for Access Studio, Road Rules, Event Engine and Traffic Stress Lab.
+• Optional companion activity for Access Studio, Road Rules, Event Engine and Traffic Stress Lab.
 • One-click disable restores the vanilla Cities: Skylines II rich-presence updater.
 
 SAFE ARCHITECTURE
@@ -21,16 +21,23 @@ Discord RPC reuses the official Discord Game SDK client already created by Citie
 
 PRIVACY
 
-City name sharing is OFF by default. Population is rounded by default. Treasury is hidden by default. Save paths, account names and mod lists are never transmitted.
+City name sharing, treasury and companion activity are OFF by default. Population is rounded by default. Companion activity may include text provided by another mod; enable it only for mods you trust. Discord RPC itself never reads save paths, account names or mod lists for presence.
 
 BETA NOTE
 
 This package remains an unlisted beta until a real Discord desktop client accepts and visibly displays its activity during the release-gate test.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <Tag Value="Code Mod" />
-  <ModVersion Value="0.9.0-beta.1" />
+  <ModVersion Value="0.9.1-beta.1" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog><![CDATA[0.9.0-beta.1
+  <ChangeLog><![CDATA[0.9.1-beta.1
+
+• Refined panel layout, connection feedback and privacy preset selection.
+• Connection failure panel opens once per failure instead of reopening after dismissal.
+• Companion activity is opt-in on new installs and respects the setting for all activity providers.
+• Updated Traffic Stress Lab activity wording for road departures.
+
+0.9.0-beta.1
 
 • Shared-client Discord Game SDK architecture.
 • Custom presence templates and live preview.

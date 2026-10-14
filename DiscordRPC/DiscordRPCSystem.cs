@@ -252,7 +252,7 @@ namespace DiscordRPC
                 s.Activity = suiteActivity;
                 if (!string.IsNullOrWhiteSpace(suiteState)) s.TrafficLine = suiteState;
             }
-            if (DiscordRPCIntegration.TryGetHighest(out string source, out string details, out string state))
+            if (settings.DetectSuiteActivity && DiscordRPCIntegration.TryGetHighest(out string source, out string details, out string state))
             {
                 s.Source = source;
                 s.Activity = details;
@@ -298,7 +298,7 @@ namespace DiscordRPC
                 int multiplier = multiplierProperty == null ? 1 : Convert.ToInt32(multiplierProperty.GetValue(null));
                 if (multiplier > 1)
                 {
-                    source = "Traffic Stress Lab"; activity = "Stress-testing city traffic"; state = multiplier + "× trip demand"; return true;
+                    source = "Traffic Stress Lab"; activity = "Stress-testing city traffic"; state = multiplier + "× road departures"; return true;
                 }
             }
             catch { }

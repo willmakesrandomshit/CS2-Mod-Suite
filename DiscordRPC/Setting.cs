@@ -77,7 +77,7 @@ namespace DiscordRPC
             ShowWeather = true;
             ShowTrafficFlow = false;
             ShowSessionTimer = true;
-            DetectSuiteActivity = true;
+            DetectSuiteActivity = false;
             DetailsTemplate = "{activity}";
             StateTemplate = "{population_line} · {date}";
             ShowToolbarButton = true;
@@ -117,7 +117,7 @@ namespace DiscordRPC
             { s.GetOptionDescLocaleID(nameof(DiscordRPCSetting.ShowTrafficFlow)), "Samples aggregate road flow at a low frequency. Disabled by default." },
             { s.GetOptionLabelLocaleID(nameof(DiscordRPCSetting.ShowSessionTimer)), "Show session timer" },
             { s.GetOptionLabelLocaleID(nameof(DiscordRPCSetting.DetectSuiteActivity)), "Detect companion mod activity" },
-            { s.GetOptionDescLocaleID(nameof(DiscordRPCSetting.DetectSuiteActivity)), "Shows active tools from Access Studio, Road Rules, Event Engine and Traffic Stress Lab when detectable." },
+            { s.GetOptionDescLocaleID(nameof(DiscordRPCSetting.DetectSuiteActivity)), "Optional. Shows active suite tools and allows companion mods to provide presence text. Enable only if you trust those mods to avoid sharing private details." },
             { s.GetOptionLabelLocaleID(nameof(DiscordRPCSetting.DetailsTemplate)), "Details template" },
             { s.GetOptionDescLocaleID(nameof(DiscordRPCSetting.DetailsTemplate)), "Tokens: {activity}, {city}, {mode}, {population}, {money}, {date}, {season}, {weather}, {temperature}, {traffic}." },
             { s.GetOptionLabelLocaleID(nameof(DiscordRPCSetting.StateTemplate)), "State template" },

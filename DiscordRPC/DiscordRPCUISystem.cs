@@ -23,6 +23,7 @@ namespace DiscordRPC
         private ValueBinding<int> m_Successes;
         private ValueBinding<int> m_Failures;
         private DateTime m_LastUiUpdate;
+        private bool m_WasConnectionFailure;
 
         protected override void OnCreate()
         {
@@ -59,6 +60,7 @@ namespace DiscordRPC
             Mod.Log.Info($"DRPC_LIFECYCLE event=preload system={nameof(DiscordRPCUISystem)} world={DescribeWorld()} purpose={purpose} mode={mode}");
             base.OnGamePreload(purpose, mode);
             m_Open?.Update(false);
+            m_WasConnectionFailure = false;
         }
 
         protected override void OnGameLoadingComplete(Purpose purpose, GameMode mode)
@@ -89,8 +91,10 @@ namespace DiscordRPC
             m_Failures.Update(ToBindingCount(DiscordRPCSystem.FailedCallbacks));
             m_Privacy.Update((s.ShareCityName ? "City shared" : "City hidden") + " · Population " + s.Population.ToString().ToLowerInvariant() + " · Treasury " + s.Money.ToString().ToLowerInvariant());
 
-            if (s.OpenPanelOnConnectionFailure && s.Enabled && DiscordRPCSystem.ConnectionStatus == "Not connected" && !m_Open.value)
+            bool connectionFailure = s.Enabled && (DiscordRPCSystem.ConnectionStatus == "Not connected" || DiscordRPCSystem.ConnectionStatus == "Update failed");
+            if (s.OpenPanelOnConnectionFailure && connectionFailure && !m_WasConnectionFailure && !m_Open.value)
                 m_Open.Update(true);
+            m_WasConnectionFailure = connectionFailure;
         }
 
         private static void SetEnabled(bool enabled)
