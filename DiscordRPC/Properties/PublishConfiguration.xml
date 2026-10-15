@@ -27,9 +27,13 @@ BETA
 This is a public beta. The earlier 0.9.2-beta.2 build was loaded in Cities: Skylines II 1.6.2f1 and accepted live activity updates in a disposable city. The 0.9.3-beta.1 visual refresh has build verification but still needs its own in-game visual check. Privacy preset actions and vanilla-presence restoration also need broader in-game verification. Review the displayed activity and choose your sharing settings before using it.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <Tag Value="Code Mod" />
-  <ModVersion Value="0.9.3-beta.2" />
+  <ModVersion Value="0.9.3-beta.3" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog><![CDATA[0.9.3-beta.2
+  <ChangeLog><![CDATA[0.9.3-beta.3
+
+• Replaced the hand-drawn Discord-like mark with Discord's official, unmodified symbol.
+
+0.9.3-beta.2
 
 • Reissued the same public-beta presentation as an Unlisted version at the user's request.
 
