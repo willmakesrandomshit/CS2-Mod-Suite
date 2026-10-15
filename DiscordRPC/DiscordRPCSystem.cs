@@ -356,7 +356,7 @@ namespace DiscordRPC
             string details = PresenceFormatting.Render(settings.DetailsTemplate, snapshot, snapshot.Activity);
             string state = PresenceFormatting.Render(settings.StateTemplate, snapshot, snapshot.Mode == "Main Menu" ? "Ready to build" : snapshot.Mode);
             if (!string.IsNullOrWhiteSpace(snapshot.TrafficLine) && state.IndexOf(snapshot.TrafficLine, StringComparison.OrdinalIgnoreCase) < 0)
-                state = PresenceFormatting.Render(state + " · " + snapshot.TrafficLine, snapshot, state);
+                state = PresenceFormatting.Render(state + " - " + snapshot.TrafficLine, snapshot, state);
 
             DetailsPreview = details;
             StatePreview = state;

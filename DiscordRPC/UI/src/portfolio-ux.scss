@@ -15,10 +15,8 @@
   }
   button { font-family: inherit; }
   button:focus, input:focus, select:focus, textarea:focus {
-    outline: 2px solid #9bcfe6;
-    outline-offset: 1px;
+    border-color: #9bcfe6;
   }
-  button:disabled { cursor: default; opacity: 0.5; }
   .suite-header, .panel-header, .ns-header, .pk-header {
     background: #1d2c37;
     border-bottom: 1px solid #465965;
@@ -45,11 +43,11 @@
     border-radius: 3px;
     padding: 5px 9px;
     font-family: inherit;
-    font-size: inherit;
+    font-size: 12px;
     cursor: pointer;
     margin-right: 6px;
     &:hover { background: #385468; }
-    &:focus { outline: 2px solid #9bcfe6; }
+    &:focus { border-color: #9bcfe6; }
   }
   .portfolio-guide, .portfolio-support {
     max-height: 180px;
@@ -64,7 +62,6 @@
     width: 100%;
     height: 110px;
     box-sizing: border-box;
-    resize: none;
     font-family: monospace;
     font-size: 11px;
     color: #edf2f5;

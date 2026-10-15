@@ -1,5 +1,15 @@
 const path = require('path');
+const webpack = require('webpack');
+const manifest = require('./mod.json');
+const moduleBanner = `/**
+ * Cities: Skylines II UI Module
+ * Id: ${manifest.id}
+ * Author: ${manifest.author}
+ * Version: ${manifest.version.split('-')[0]}
+ * Dependencies: ${(manifest.dependencies || []).join(', ')}
+ */`;
 module.exports = {
+  plugins: [new webpack.BannerPlugin({ banner: moduleBanner, raw: true, stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT })],
   entry: './src/index.tsx',
   output: { path: path.resolve(__dirname, 'dist'), filename: 'DiscordRPC.mjs', library: { type: 'module' }, publicPath: 'coui://ui-mods/' },
   module: { rules: [

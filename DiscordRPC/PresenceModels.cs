@@ -49,6 +49,8 @@ namespace DiscordRPC
             };
             string value = Regex.Replace(template, @"\{([a-z_]+)\}", m => values.TryGetValue(m.Groups[1].Value, out string v) ? v ?? string.Empty : m.Value, RegexOptions.IgnoreCase);
             value = s_Separators.Replace(value, string.Empty);
+            // Cohtml and some Discord font fallbacks render these separators as missing glyphs.
+            value = value.Replace('·', '-').Replace('•', '-').Replace('|', '-');
             value = s_Whitespace.Replace(value, " ").Trim(' ', '·', '•', '|', '-', ',');
             if (value.Length > 128) value = value.Substring(0, 125) + "...";
             return string.IsNullOrWhiteSpace(value) ? fallback : value;

@@ -58,7 +58,7 @@ namespace DiscordRPC
             set
             {
                 DetailsTemplate = "{activity}";
-                StateTemplate = "{population_line} · {date}";
+                StateTemplate = "{population_line} - {date}";
                 ApplyAndSave();
                 DiscordRPCRuntime.RequestImmediateUpdate();
             }
@@ -79,7 +79,7 @@ namespace DiscordRPC
             ShowSessionTimer = true;
             DetectSuiteActivity = false;
             DetailsTemplate = "{activity}";
-            StateTemplate = "{population_line} · {date}";
+            StateTemplate = "{population_line} - {date}";
             ShowToolbarButton = true;
             OpenPanelOnConnectionFailure = false;
         }

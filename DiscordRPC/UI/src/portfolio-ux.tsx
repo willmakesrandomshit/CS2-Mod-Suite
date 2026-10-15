@@ -44,7 +44,7 @@ export function PortfolioHelp({ name, version, runtimeGroup, steps, note, bindin
   name: string; version: string; steps: string[]; note: string;
   runtimeGroup: string; bindings: Record<string, Binding>; text?: HelpText;
 }) {
-  const [guide, setGuide] = useRememberedPreference(`${name}.guide`, true);
+  const [guide, setGuide] = useRememberedPreference(`${name}.guide.compact`, false);
   const [support, setSupport] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>({});
   const reportRef = useRef<HTMLTextAreaElement>(null);

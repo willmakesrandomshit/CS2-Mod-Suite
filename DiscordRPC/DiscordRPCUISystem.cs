@@ -38,7 +38,7 @@ namespace DiscordRPC
             AddBinding(m_LastUpdate = new ValueBinding<string>("discordRPC", "lastUpdate", "Not sent yet"));
             AddBinding(m_Source = new ValueBinding<string>("discordRPC", "source", "Cities: Skylines II"));
             AddBinding(m_Mode = new ValueBinding<string>("discordRPC", "mode", "Main Menu"));
-            AddBinding(m_Privacy = new ValueBinding<string>("discordRPC", "privacy", "City hidden · Population rounded · Treasury hidden"));
+            AddBinding(m_Privacy = new ValueBinding<string>("discordRPC", "privacy", "City hidden / Population rounded / Treasury hidden"));
             AddBinding(m_Interval = new ValueBinding<int>("discordRPC", "interval", 15));
             // Colossal's UI serializer has no writer for Int64. An exception here is
             // particularly dangerous: UISystemBase has already subscribed its preload
@@ -89,7 +89,7 @@ namespace DiscordRPC
             m_Interval.Update(Math.Max(15, s.UpdateIntervalSeconds));
             m_Successes.Update(ToBindingCount(DiscordRPCSystem.SuccessfulCallbacks));
             m_Failures.Update(ToBindingCount(DiscordRPCSystem.FailedCallbacks));
-            m_Privacy.Update((s.ShareCityName ? "City shared" : "City hidden") + " · Population " + s.Population.ToString().ToLowerInvariant() + " · Treasury " + s.Money.ToString().ToLowerInvariant());
+            m_Privacy.Update((s.ShareCityName ? "City shared" : "City hidden") + " / Population " + s.Population.ToString().ToLowerInvariant() + " / Treasury " + s.Money.ToString().ToLowerInvariant());
 
             bool connectionFailure = s.Enabled && (DiscordRPCSystem.ConnectionStatus == "Not connected" || DiscordRPCSystem.ConnectionStatus == "Update failed");
             if (s.OpenPanelOnConnectionFailure && connectionFailure && !m_WasConnectionFailure && !m_Open.value)
@@ -142,11 +142,11 @@ namespace DiscordRPC
                     break;
                 case "city":
                     Mod.Settings.DetailsTemplate = "{activity}";
-                    Mod.Settings.StateTemplate = "{population_line} · {date}";
+                    Mod.Settings.StateTemplate = "{population_line} - {date}";
                     break;
                 case "weather":
                     Mod.Settings.DetailsTemplate = "{activity}";
-                    Mod.Settings.StateTemplate = "{season} · {weather_line} · {population_line}";
+                    Mod.Settings.StateTemplate = "{season} - {weather_line} - {population_line}";
                     break;
                 default: return;
             }

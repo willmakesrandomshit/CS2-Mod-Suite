@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Publish>
-  <ModId Value="0" />
+  <ModId Value="163323" />
   <DisplayName Value="Discord RPC" />
   <ShortDescription Value="Custom, private-by-default Discord Rich Presence" />
   <LongDescription><![CDATA[Discord RPC gives Cities: Skylines II a richer, configurable Discord presence without opening a second Discord connection.
@@ -25,13 +25,16 @@ City name sharing, treasury and companion activity are OFF by default. Populatio
 
 BETA NOTE
 
-This package remains an unlisted beta until a real Discord desktop client accepts and visibly displays its activity during the release-gate test.]]></LongDescription>
+Unlisted beta. Live activity acceptance was observed in Discord desktop on CSII 1.6.2f1; privacy preset actions still need runtime verification.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <Tag Value="Code Mod" />
-  <ModVersion Value="0.9.1-beta.1" />
+  <ModVersion Value="0.9.2-beta.2" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog><![CDATA[0.9.1-beta.1
+  <ChangeLog><![CDATA[0.9.2-beta.2
 
+• Matched the panel font to CSII's Overpass/Noto Sans UI fonts after in-game inspection.
+• Fixed in-game panel spacing, unsupported glyph separators, and right-side UI overlap.
+• Used CSII-style system fonts and kept the quick guide collapsed by default.
 • Refined panel layout, connection feedback and privacy preset selection.
 • Connection failure panel opens once per failure instead of reopening after dismissal.
 • Companion activity is opt-in on new installs and respects the setting for all activity providers.
@@ -47,6 +50,6 @@ This package remains an unlisted beta until a real Discord desktop client accept
 • Companion mod activity priority with automatic expiry.
 • Cooperative vanilla updater restoration.
 
-Unlisted beta: public release requires visible Discord-client runtime proof.]]></ChangeLog>
+Unlisted beta: do not change to Public until privacy preset actions and vanilla-presence restoration are verified.]]></ChangeLog>
   <AccessLevel Value="Unlisted" />
 </Publish>
