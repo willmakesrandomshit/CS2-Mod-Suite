@@ -96,8 +96,8 @@ const Panel: React.FC = () => {
         <p className="hint">Other mods can use the public DiscordRPCIntegration API without linking the Discord SDK.</p>
       </>}
     </main>
-    <PortfolioHelp runtimeGroup={"Portfolio.DiscordRPC"} name={"Discord RPC"} version={"0.9.3-beta.1"} steps={["Check the connection status with Discord running.", "Choose a privacy preset before enabling enhanced presence.", "Review the displayed activity and use Refresh presence."]} note={"The preview is not proof that Discord accepted the activity. Check the actual Discord client."} bindings={portfolioBindings} />
-    <footer><span>Uses CSII's Discord connection</span><span>0.9.3 beta.1</span></footer>
+    <PortfolioHelp runtimeGroup={"Portfolio.DiscordRPC"} name={"Discord RPC"} version={"0.9.3-beta.2"} steps={["Check the connection status with Discord running.", "Choose a privacy preset before enabling enhanced presence.", "Review the displayed activity and use Refresh presence."]} note={"The preview is not proof that Discord accepted the activity. Check the actual Discord client."} bindings={portfolioBindings} />
+    <footer><span>Uses CSII's Discord connection</span><span>0.9.3 beta.2</span></footer>
   </div>;
 };
 
