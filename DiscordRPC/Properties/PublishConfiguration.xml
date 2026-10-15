@@ -2,54 +2,54 @@
 <Publish>
   <ModId Value="163323" />
   <DisplayName Value="Discord RPC" />
-  <ShortDescription Value="Custom, private-by-default Discord Rich Presence" />
-  <LongDescription><![CDATA[Discord RPC gives Cities: Skylines II a richer, configurable Discord presence without opening a second Discord connection.
+  <ShortDescription Value="A polished, privacy-first Discord activity panel for Cities: Skylines II" />
+  <LongDescription><![CDATA[Show what you are doing in Cities: Skylines II on Discord, with a live activity preview and clear controls for what you share.
 
-FEATURES
+WHAT IT DOES
 
-• Live city activity, population, date, season, weather, temperature and optional traffic flow.
-• Private-by-default city names and configurable population/treasury precision.
-• Custom Details and State templates with readable tokens.
-• Session timer and activity preview.
-• Connection diagnostics, manual refresh and automatic reconnect attempts.
-• Optional companion activity for Access Studio, Road Rules, Event Engine and Traffic Stress Lab.
-• One-click disable restores the vanilla Cities: Skylines II rich-presence updater.
+• Shows your current game activity, city, population, date, season, weather, temperature and optional traffic flow.
+• Lets you adjust the Details and State lines with readable template tokens.
+• Includes a live preview, connection status, refresh control and callback diagnostics.
+• Offers Private, Social and Detailed privacy presets plus fine-grained settings.
+• Can show optional activity from compatible suite tools, then return to your city status.
+• Can be switched off to hand presence back to the game's vanilla updater.
 
-SAFE ARCHITECTURE
+PRIVACY BY DEFAULT
 
-Discord RPC reuses the official Discord Game SDK client already created by Cities: Skylines II (client ID 1125009418476605441). It does not ship another SDK, request a token, launch a helper process or create competing Discord ownership.
+City-name sharing, treasury and companion activity start off. Population starts rounded. You choose whether to share more. Companion text comes from the other mod that supplies it, so only enable integrations you trust. This mod does not read save paths, account names or your installed mod list for Discord activity.
 
-PRIVACY
+HOW IT WORKS
 
-City name sharing, treasury and companion activity are OFF by default. Population is rounded by default. Companion activity may include text provided by another mod; enable it only for mods you trust. Discord RPC itself never reads save paths, account names or mod lists for presence.
+Discord RPC uses the Discord Game SDK client already owned by Cities: Skylines II. It does not bundle another Discord SDK, ask for a token, launch a helper process or create a second Discord connection. Discord desktop must be running for activity to appear.
 
-BETA NOTE
+BETA
 
-Unlisted beta. Live activity acceptance was observed in Discord desktop on CSII 1.6.2f1; privacy preset actions still need runtime verification.]]></LongDescription>
+This is a public beta. The earlier 0.9.2-beta.2 build was loaded in Cities: Skylines II 1.6.2f1 and accepted live activity updates in a disposable city. The 0.9.3-beta.1 visual refresh has build verification but still needs its own in-game visual check. Privacy preset actions and vanilla-presence restoration also need broader in-game verification. Review the displayed activity and choose your sharing settings before using it.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <Tag Value="Code Mod" />
-  <ModVersion Value="0.9.2-beta.2" />
+  <ModVersion Value="0.9.3-beta.1" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog><![CDATA[0.9.2-beta.2
+  <ChangeLog><![CDATA[0.9.3-beta.1
+
+• Prepared a public beta listing with clearer feature and privacy details.
+• Reworked the in-game panel hierarchy and Discord-themed visual styling.
+• Added original, hand-drawn Discord RPC artwork.
+• Retained the tested shared-client integration and opt-in privacy defaults.
+
+0.9.2-beta.2
 
 • Matched the panel font to CSII's Overpass/Noto Sans UI fonts after in-game inspection.
 • Fixed in-game panel spacing, unsupported glyph separators, and right-side UI overlap.
-• Used CSII-style system fonts and kept the quick guide collapsed by default.
 • Refined panel layout, connection feedback and privacy preset selection.
-• Connection failure panel opens once per failure instead of reopening after dismissal.
 • Companion activity is opt-in on new installs and respects the setting for all activity providers.
-• Updated Traffic Stress Lab activity wording for road departures.
 
 0.9.0-beta.1
 
 • Shared-client Discord Game SDK architecture.
 • Custom presence templates and live preview.
-• Private, Social and Detailed privacy presets.
-• Population, money, date, season, weather and traffic tokens.
+• Privacy presets and presence tokens.
 • Reconnect state and callback diagnostics.
 • Companion mod activity priority with automatic expiry.
-• Cooperative vanilla updater restoration.
-
-Unlisted beta: do not change to Public until privacy preset actions and vanilla-presence restoration are verified.]]></ChangeLog>
-  <AccessLevel Value="Unlisted" />
+• Cooperative vanilla updater restoration.]]></ChangeLog>
+  <AccessLevel Value="Public" />
 </Publish>

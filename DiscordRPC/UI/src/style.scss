@@ -1,88 +1,89 @@
 .drpc-toolbar {
   width: 54rem; height: 54rem; padding: 7rem;
-  border: 1rem solid #a5d8e6; border-radius: 6rem;
-  background: #59bfdc; cursor: pointer;
+  border: 1rem solid rgba(255, 255, 255, .22); border-radius: 6rem;
+  background: #5865f2; cursor: pointer; transition: background-color .12s ease;
   img { display: block; width: 38rem; height: 38rem; }
-  &:hover, &.active { background: #86d2e8; }
+  &:hover, &.active { background: #7280ff; }
 }
 
 .drpc-panel {
   position: absolute; top: 92rem; right: 130rem; z-index: 1000;
   display: flex; flex-direction: column; box-sizing: border-box;
-  width: 430rem; max-height: calc(100vh - 112rem); overflow: hidden;
-  border: 1rem solid #526574; border-radius: 6rem; background: #192731;
-  box-shadow: 0 8rem 24rem rgba(0, 0, 0, .42); color: #ecf2f5;
-  font-family: 'Overpass', 'Noto Sans', sans-serif; font-size: 12rem; line-height: 1.4;
+  width: 440rem; max-height: calc(100vh - 112rem); overflow: hidden;
+  border: 1rem solid #4b536f; border-radius: 8rem; background: #171923;
+  box-shadow: 0 10rem 30rem rgba(0, 0, 0, .48); color: #f2f3f7;
+  font-family: 'Overpass', 'Noto Sans', sans-serif; font-size: 12rem; line-height: 1.45;
   * { box-sizing: border-box; }
   button { font-family: inherit; font-size: 12rem; cursor: pointer; }
-  button:focus { border-color: #a2d9ec; }
+  button:focus-visible { outline: 2rem solid #aab1ff; outline-offset: 1rem; }
 
   .drpc-header {
-    display: flex; align-items: center; gap: 10rem; flex-shrink: 0;
-    padding: 12rem 15rem; border-bottom: 1rem solid #435663; background: #20313d;
-    img { width: 34rem; height: 34rem; }
-    h2 { margin: 0; font-size: 17rem; font-weight: 650; line-height: 1.2; }
-    span { color: #bdcbd3; font-size: 11rem; }
+    display: flex; align-items: center; gap: 11rem; flex-shrink: 0;
+    padding: 13rem 16rem; border-bottom: 1rem solid #34384b; background: #202230;
+    img { width: 36rem; height: 36rem; border-radius: 7rem; }
+    h2 { margin: 0; font-size: 17rem; font-weight: 700; line-height: 1.2; letter-spacing: .01em; }
+    span { color: #b6b9ca; font-size: 11rem; }
   }
   .drpc-close {
-    margin-left: auto; padding: 5rem 7rem; border: 1rem solid #66808d; background: transparent;
-    color: #dfebef; font-size: 11rem; line-height: 1;
-    &:hover { color: #fff; background: #334a58; }
+    margin-left: auto; padding: 6rem 9rem; border: 1rem solid #50546a; border-radius: 4rem; background: transparent;
+    color: #e5e6ef; font-size: 11rem; line-height: 1;
+    &:hover { color: #fff; background: #34364a; }
   }
   .status-strip {
     display: flex; align-items: flex-start; gap: 10rem; flex-shrink: 0;
-    padding: 10rem 15rem; border-bottom: 1rem solid #394e59; background: #17242d;
-    .status-dot { width: 8rem; height: 8rem; margin-top: 4rem; flex-shrink: 0; border-radius: 50%; background: #95a9b6; }
+    padding: 11rem 16rem; border-bottom: 1rem solid #34384b; background: #1b1d29;
+    .status-dot { width: 8rem; height: 8rem; margin-top: 5rem; flex-shrink: 0; border-radius: 50%; background: #9da2b6; }
     div { display: flex; flex-direction: column; min-width: 0; gap: 2rem; }
-    b { font-size: 12rem; font-weight: 650; }
-    div span { color: #bccbd3; font-size: 11rem; overflow-wrap: anywhere; }
-    &.ok .status-dot { background: #69c99a; }
-    &.warn .status-dot { background: #e4b15d; }
+    b { font-size: 12rem; font-weight: 700; }
+    div span { color: #c1c3d0; font-size: 11rem; overflow-wrap: anywhere; }
+    &.ok .status-dot { background: #45c58a; }
+    &.warn .status-dot { background: #f0ba58; }
   }
   nav {
-    display: flex; flex-shrink: 0; border-bottom: 1rem solid #435663; background: #20313d;
-    button { flex: 1; padding: 9rem 3rem; border: 0; border-bottom: 2rem solid transparent; background: transparent; color: #b8c9d3; text-transform: capitalize;
-      &:hover { background: #2b4250; color: #fff; }
-      &.active { border-bottom-color: #7bc6e1; color: #fff; font-weight: 650; }
+    display: flex; flex-shrink: 0; border-bottom: 1rem solid #34384b; background: #202230;
+    button { flex: 1; padding: 10rem 3rem 9rem; border: 0; border-bottom: 2rem solid transparent; background: transparent; color: #c0c2d1; text-transform: capitalize;
+      &:hover { background: #2b2d3c; color: #fff; }
+      &.active { border-bottom-color: #8890ff; color: #fff; font-weight: 700; }
     }
   }
-  main { min-height: 0; flex: 1 1 auto; overflow-y: auto; padding: 14rem 15rem 16rem; }
-  .drpc-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8rem; margin-bottom: 9rem;
-    h3 { margin: 0; font-size: 14rem; font-weight: 650; }
-    span { color: #aabfc9; font-size: 10rem; text-align: right; }
+  main { min-height: 0; flex: 1 1 auto; overflow-y: auto; padding: 15rem 16rem 17rem; }
+  .drpc-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8rem; margin-bottom: 10rem;
+    h3 { margin: 0; font-size: 14rem; font-weight: 700; }
+    span { color: #afb2c3; font-size: 10rem; text-align: right; }
   }
   .preview {
-    display: flex; gap: 11rem; min-width: 0; padding: 13rem;
-    border: 1rem solid #495e6b; border-radius: 4rem; background: #223442;
-    .preview-icon img { width: 50rem; height: 50rem; }
-    div:last-child { display: flex; min-width: 0; flex-direction: column; gap: 2rem; }
-    small { color: #b7c8d2; font-size: 9rem; letter-spacing: .04em; }
-    strong { overflow: hidden; font-size: 14rem; text-overflow: ellipsis; white-space: nowrap; }
-    span { overflow-wrap: anywhere; color: #d8e3e8; }
-    .preview-meta { color: #aebfca; font-size: 10rem; }
+    display: flex; gap: 12rem; min-width: 0; padding: 13rem;
+    border: 1rem solid #494d66; border-radius: 6rem; background: #242637;
+    .preview-icon img { width: 50rem; height: 50rem; border-radius: 8rem; }
+    div:last-child { display: flex; min-width: 0; flex-direction: column; gap: 3rem; }
+    small { color: #c4c6d4; font-size: 9rem; letter-spacing: .06em; }
+    strong { overflow: hidden; font-size: 14rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    span { overflow-wrap: anywhere; color: #e0e1e9; }
+    .preview-meta { color: #b5b7c7; font-size: 10rem; }
   }
-  .drpc-caption, .hint, .token-list { margin: 9rem 0 0; color: #b3c3cc; font-size: 11rem; line-height: 1.45; }
-  .grid { display: flex; flex-wrap: wrap; gap: 8rem; margin-top: 13rem;
-    article { min-width: 0; flex: 1 1 42%; padding: 9rem 10rem; border: 1rem solid #3e5360; border-radius: 4rem; background: #20313d; }
-    label { display: block; margin-bottom: 3rem; color: #b4c4cd; font-size: 10rem; }
-    b { font-size: 12rem; font-weight: 650; overflow-wrap: anywhere; }
+  .drpc-caption, .hint, .token-list { margin: 10rem 0 0; color: #c1c3d0; font-size: 11rem; line-height: 1.5; }
+  .grid { display: flex; flex-wrap: wrap; gap: 8rem; margin-top: 14rem;
+    article { min-width: 0; flex: 1 1 42%; padding: 10rem 11rem; border: 1rem solid #3b3e53; border-radius: 5rem; background: #202230; }
+    label { display: block; margin-bottom: 4rem; color: #b8bbca; font-size: 10rem; }
+    b { font-size: 12rem; font-weight: 700; overflow-wrap: anywhere; }
   }
-  .actions, .preset-row { display: flex; gap: 8rem; margin-top: 13rem;
-    button { flex: 1; min-width: 0; padding: 9rem; border: 1rem solid #64808e; border-radius: 4rem; background: #2a4050; color: #edf4f7; text-align: center;
-      &:hover { background: #395568; }
-      &.primary, &.active { border-color: #88cee3; background: #315f70; }
+  .actions, .preset-row { display: flex; gap: 8rem; margin-top: 14rem;
+    button { flex: 1; min-width: 0; padding: 9rem; border: 1rem solid #585c76; border-radius: 5rem; background: #292b3b; color: #f3f3f8; text-align: center;
+      &:hover { background: #37394c; }
+      &.primary, &.active { border-color: #858cff; background: #434ac2; }
+      &:disabled { cursor: default; opacity: .5; }
     }
   }
-  .info { padding: 11rem 12rem; border: 1rem solid #3e5360; border-radius: 4rem; background: #20313d;
-    p { margin: 4rem 0 0; color: #c4d1d8; line-height: 1.5; }
-    p + p { margin-top: 8rem; font-size: 11rem; }
+  .info { padding: 12rem 13rem; border: 1rem solid #3b3e53; border-radius: 5rem; background: #202230;
+    p { margin: 4rem 0 0; color: #e0e1e9; line-height: 1.5; }
+    p + p { margin-top: 8rem; font-size: 11rem; color: #bec0cd; }
   }
-  ul { margin: 8rem 0; padding: 0; list-style: none; }
-  li { display: flex; justify-content: space-between; gap: 10rem; padding: 9rem 1rem; border-bottom: 1rem solid #3e5360;
-    span { color: #b8c8d0; text-align: right; }
+  ul { margin: 9rem 0; padding: 0; list-style: none; }
+  li { display: flex; justify-content: space-between; gap: 10rem; padding: 9rem 1rem; border-bottom: 1rem solid #3b3e53;
+    span { color: #bec0cd; text-align: right; }
   }
-  .portfolio-help { flex-shrink: 0; max-height: 210rem; overflow-y: auto; }
+  .portfolio-help { flex-shrink: 0; max-height: 190rem; overflow-y: auto; }
   .portfolio-help-actions { display: flex; gap: 7rem; }
   .portfolio-help-actions button { flex: 1; margin: 0; }
-  footer { display: flex; justify-content: space-between; gap: 8rem; flex-shrink: 0; padding: 7rem 15rem; border-top: 1rem solid #405663; color: #b3c4cd; font-size: 10rem; }
+  footer { display: flex; justify-content: space-between; gap: 8rem; flex-shrink: 0; padding: 8rem 16rem; border-top: 1rem solid #34384b; color: #bfc1ce; font-size: 10rem; }
 }

@@ -8,7 +8,7 @@ namespace DiscordRPC
 {
     public sealed class Mod : IMod
     {
-        public const string Version = "0.9.2-beta.2";
+        public const string Version = "0.9.3-beta.1";
         public static readonly ILog Log = LogManager.GetLogger(nameof(DiscordRPC)).SetShowsErrorsInUI(false);
         public static DiscordRPCSetting Settings { get; private set; }
 
