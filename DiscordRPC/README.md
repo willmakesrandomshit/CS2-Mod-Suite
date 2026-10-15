@@ -2,8 +2,8 @@
 
 Show what you are doing in Cities: Skylines II on Discord, with a live activity preview and clear controls for what you share.
 
-- **Status:** 0.9.3-beta.1 public beta candidate; upload has not completed
-- **PDX:** item 163323 is currently the older Unlisted 0.9.2-beta.2 build: [Discord RPC on Paradox Mods](https://mods.paradoxplaza.com/mods/163323/Windows)
+- **Status:** 0.9.3-beta.1 public beta, published to PDX Mods
+- **PDX:** [Discord RPC on Paradox Mods, item 163323](https://mods.paradoxplaza.com/mods/163323/Windows)
 - **Licence:** MIT
 - **Build:** follow [BUILDING.md](../BUILDING.md); Discord SDK assemblies come from the game and are not bundled
 - **Privacy:** city name sharing, treasury and companion activity start off; population starts rounded. Companion activity may contain text from another mod, so only enable integrations you trust.
@@ -11,7 +11,7 @@ Show what you are doing in Cities: Skylines II on Discord, with a live activity 
 
 ## Verified so far
 
-Version 0.9.2-beta.2 built with zero warnings or errors and loaded in CSII 1.6.2f1. It connected through the game's Discord SDK and produced accepted callbacks in the disposable Harlaem 2 city with zero failures. The panel was visually checked in-game. The 0.9.3-beta.1 listing, artwork and UI refresh still need their own build and in-game verification before release.
+Version 0.9.2-beta.2 built with zero warnings or errors and loaded in CSII 1.6.2f1. It connected through the game's Discord SDK and produced accepted callbacks in the disposable Harlaem 2 city with zero failures. The panel was visually checked in-game. Version 0.9.3-beta.1 and its artwork are now published; its panel refresh has build verification but still needs its own in-game visual check.
 
 Privacy preset actions and vanilla-presence restoration remain unverified. Before calling the public beta fully verified, test privacy presets, disabling enhanced presence, reconnect, and the dismissed failure panel in a disposable city with Discord desktop. Check the actual Discord client and inspect the DiscordRPC log for failed callbacks and repeated errors.
 
