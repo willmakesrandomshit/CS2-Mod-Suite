@@ -42,3 +42,12 @@
 - An earlier Debug/Release build and deployment used hash
   `061629D54548A21CF0E35F43ECA8AC748C2C821E5EE99988BCC2EFB7F5AF0164`.
   This hash is superseded by the current-session hash above.
+
+## 22 October 2026 — follow-up after centered-mesh build
+
+- Rebuilt the current source in Debug and Release; both builds completed with 0 warnings and 0 errors, including the game mod post-processor.
+- Release and deployed DLL SHA-256 both match: `AFF6892483B0A970CDAAD12A90688F0798F58B464B1608649A095070257B043F`.
+- In a clean Steam launch, the game loaded the deployed mod and registered `Modular Growables Duplex 01` from the two logged vanilla low-density residential sources with a `4x2` footprint and two meshes.
+- The mod log has no error or exception entries; inspected Modding/SceneFlow entries show the mod and no attributed exception.
+- Loaded the disposable `growablesqa` city. The developer/object browser did not open with Home or Tab, so no generated instance could be rendered or inspected. No city edits were made or saved.
+- **Verification status: partial.** Build, deployment, load, and prefab registration are verified. Spawn, visual alignment/orientation, and gameplay behavior remain unverified; this is not a playable-prototype pass.

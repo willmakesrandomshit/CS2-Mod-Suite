@@ -88,7 +88,8 @@ namespace GrowableModulesPrototype
                     return;
                 }
 
-                var composedMeshes = ComposeMeshes(baseBuilding, moduleBuilding, baseBuilding.m_LotWidth * ZoneUtils.CELL_SIZE);
+                float halfModuleWidth = baseBuilding.m_LotWidth * ZoneUtils.CELL_SIZE * 0.5f;
+                var composedMeshes = ComposeMeshes(baseBuilding, moduleBuilding, -halfModuleWidth, halfModuleWidth);
                 if (composedMeshes == null)
                 {
                     m_PrefabSystem.RemovePrefab(registeredClone);
@@ -168,14 +169,14 @@ namespace GrowableModulesPrototype
             return false;
         }
 
-        private static ObjectMeshInfo[] ComposeMeshes(BuildingPrefab first, BuildingPrefab second, float horizontalOffset)
+        private static ObjectMeshInfo[] ComposeMeshes(BuildingPrefab first, BuildingPrefab second, float firstHorizontalOffset, float secondHorizontalOffset)
         {
             if (first.m_Meshes == null || second.m_Meshes == null || first.m_Meshes.Length == 0 || second.m_Meshes.Length == 0)
                 return null;
 
             var result = new List<ObjectMeshInfo>(first.m_Meshes.Length + second.m_Meshes.Length);
-            if (CopyMeshes(first.m_Meshes, result, 0f) == 0 ||
-                CopyMeshes(second.m_Meshes, result, horizontalOffset) == 0)
+            if (CopyMeshes(first.m_Meshes, result, firstHorizontalOffset) == 0 ||
+                CopyMeshes(second.m_Meshes, result, secondHorizontalOffset) == 0)
                 return null;
 
             return result.ToArray();
