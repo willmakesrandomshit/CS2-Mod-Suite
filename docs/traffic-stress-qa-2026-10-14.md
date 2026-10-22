@@ -57,3 +57,15 @@ Computer Use, restart or city modification occurred. Remaining runtime gate:
 compare vanilla/2x/5x/10x/25x on the same connected disposable city, observe native
 departures and vehicle count over several batches, inspect logs, verify Stop drains
 normally, and check roads not on random through-traffic routes are not misrepresented.
+
+## Rebuild check: 22 October 2026
+
+- Re-ran the Traffic Stress Lab offline suite: 56 assertions passed.
+- Rebuilt Debug and Release: both completed with zero warnings and zero errors.
+- Release DLL source and deployed DLL SHA-256 match:
+  `87808038A447E96C17CDF477D4F16683790D23AF7C85C07FE5EC85374363EABD`.
+- UI bundle source and deployed UI bundle SHA-256 match:
+  `548F4DA2CD0634ECCCA28ED0D630079A51FB9EC703D260AA3DB5DDB781115A70`.
+- The local candidate is current and deployed. The game was not restarted or
+  interacted with during this check, so runtime traffic volume and preset
+  effectiveness remain **not tested in this pass**. No PDX update was made.
