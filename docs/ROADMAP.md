@@ -15,7 +15,7 @@ CS2-Mod-Suite, RoadRules or CityMCP.
 ## P1 - no game needed
 6. Merge this branch (docs/build/CI/lockfile fixes).
 7. Extract pure logic (policies, parsers) from big files (RoadRulesSystem 1.5k lines, MagicMarking 2k) into testable files like TrafficStressPolicy, add offline tests.
-8. De-duplicate PortfolioSupportUISystem.cs (13 drifted copies of one template) into a shared source include.
+8. ~~De-duplicate PortfolioSupportUISystem.cs~~ - checked: all 13 copies are byte-identical instantiations of `shared/PortfolioSupportUISystem.cs.template` (only namespace/ID differ), so nothing to fix.
 9. Replace silent `catch {}` (SaveGuard Setting.cs, ContourPlus TopographySystem, MagicMarking AutoGenerator, DiscordRPC) with logged failures; SuiteBridge ones are probably intentional.
 10. Align UI toolchains (TypeScript 4.8.4 vs 5.x, webpack 5.93-5.97) and clear `npm audit` (11 findings, build-time only, not shipped).
 
