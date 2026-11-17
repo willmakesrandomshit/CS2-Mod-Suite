@@ -22,4 +22,6 @@ CS2-Mod-Suite, RoadRules or CityMCP.
 ## P2 - features / housekeeping
 11. Licence hygiene: Magic Marking + Junction Studio GPL-3.0 (keep isolated; JS only references TRL DLL - confirm GPL stance with a licence read); Magic Marking cannot coexist with TRL.
 12. Network Studio / Parkify / GrowableModules: decide ship or archive (all unverified prototypes).
-13. Keep README/SOURCE_INVENTORY versions in sync (add a check script).
+13. Keep versions in sync: run `node scripts/check-versions.cjs`. It currently flags **FastTrack**: PublishConfiguration.xml says 1.3.5-beta.1 (and its changelog) while csproj/mod.json/README say 1.3.5-beta.2. Left untouched because it is publish metadata; fix with a proper changelog before any release.
+
+Build status: all 15 projects built clean (0 errors/0 warnings) except SaveGuard/CrashLens/AccessStudio/CityPulse results confirmed in logs as available at time of writing; see commit message. Reviewed `catch {}` sites: best-effort UI/interop reads, left as-is because changing them needs in-game testing.
