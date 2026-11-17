@@ -1,0 +1,33 @@
+.cs-card {
+  position: absolute;
+  bottom: 120px;
+  left: 24px;
+  width: 360px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  color: #f8fafc;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 14px 16px;
+  pointer-events: auto;
+  z-index: 900;
+
+  .cs-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .cs-title { font-size: 17px; font-weight: 700; }
+  .cs-close {
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .cs-body { margin: 0; font-size: 14px; line-height: 1.5; color: #e2e8f0; }
+  .cs-foot { margin-top: 10px; font-size: 11px; color: #94a3b8; }
+}

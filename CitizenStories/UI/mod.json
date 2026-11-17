@@ -1,0 +1,8 @@
+{
+  "id": "CitizenStories",
+  "name": "Citizen Stories",
+  "version": "0.1.0-alpha.1",
+  "author": "progamer8785",
+  "description": "Select a citizen and read their story, built from real data about their home, job, school and mood. Read-only.",
+  "scripts": ["CitizenStories.mjs"]
+}

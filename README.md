@@ -27,6 +27,7 @@ Repository: https://github.com/willmakesrandomshit/CS2-Mod-Suite
 | Network Studio | Road-furniture placement prototype | Not publicly released | Development only | [NetworkStudio](NetworkStudio/) |
 | Parkify | Pedestrian-oriented park-access prototype | Not publicly released | Development only | [Parkify](Parkify/) |
 | Discord RPC | Configurable Discord presence prototype | Not publicly released | Development only | [DiscordRPC](DiscordRPC/) |
+| Citizen Stories | Read-only citizen story cards from real game data | Not publicly released | Development only (never run in-game) | [CitizenStories](CitizenStories/) |
 
 ## Building
 
