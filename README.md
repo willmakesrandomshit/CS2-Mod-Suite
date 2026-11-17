@@ -27,6 +27,7 @@ Repository: https://github.com/willmakesrandomshit/CS2-Mod-Suite
 | Network Studio | Road-furniture placement prototype | Not publicly released | Development only | [NetworkStudio](NetworkStudio/) |
 | Parkify | Pedestrian-oriented park-access prototype | Not publicly released | Development only | [Parkify](Parkify/) |
 | Discord RPC | Configurable Discord presence prototype | Not publicly released | Development only | [DiscordRPC](DiscordRPC/) |
+| Auto Director | One-button cinematic camera that follows moving cars | Not publicly released | Development only (never run in-game) | [AutoDirector](AutoDirector/) |
 
 ## Building
 

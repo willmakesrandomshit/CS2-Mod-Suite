@@ -1,0 +1,8 @@
+{
+  "id": "AutoDirector",
+  "name": "Auto Director",
+  "version": "0.1.0-alpha.1",
+  "author": "progamer8785",
+  "description": "One button: the camera follows and orbits moving vehicles with cinematic cuts, for filming your city.",
+  "scripts": ["AutoDirector.mjs"]
+}
