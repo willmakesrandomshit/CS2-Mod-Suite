@@ -18,7 +18,7 @@ substitute for the outstanding in-game runtime matrices noted below.
 | RoadRules | Public source ready | 155436 / 1.4.4 | 1.4.5-beta.1 | Physical-lane access, preferences and closures | Selective class and overlay matrix remains partially verified; some rules are soft preferences | MIT |
 | SaveGuard | Public source ready | 155424 / 1.2.3 | 1.2.4-beta.1 | Restore points and restored copies | Recovery is never guaranteed; restored-copy load coverage is incomplete | MIT |
 | TrafficStressLab | Public source ready | 155230 / 1.5.4 | 1.5.7-beta.1 | Additional bounded native road-trip requests | High multipliers are experimental; requests are not guaranteed visible vehicles | MIT |
-| AccessStudio | Public source ready | 156034 / 0.3.2-alpha.1 | 0.3.3-alpha.1 | Manual service-access editing | Remote Service Point is experimental and support varies by building/network | MIT |
+| AccessStudio | Public source ready | 156034 / 0.3.2-alpha.1 | 0.3.3-alpha.2 | Manual service-access editing | Remote Service Point is experimental and support varies by building/network | MIT |
 | CityPulse | Public source ready | 155450 / 3.0.3 | 3.0.4-beta.1 | Read-only city observations and heuristics | Diagnostic scores are clues, not proof of a cause | MIT |
 | ContourPlus | Public source ready | 155427 / 1.2.4 | 1.2.5-beta.1 | Terrain contours and grade-planning readouts | Bounded sampling can raise effective intervals; not surveying data | MIT |
 | CrashLens | Public source ready | 155239 / 1.1.3 | 1.1.4-beta.1 | Local error evidence and support export | Suspect ranking is not attribution; exported reports require privacy review | MIT |
@@ -27,7 +27,7 @@ substitute for the outstanding in-game runtime matrices noted below.
 | MagicMarking | Public source ready with upstream attribution | 155247 / 2.4.0 | 2.4.1-beta.1 | Snap-and-paint road-marking editor | Visual only; incompatible with simultaneously enabling Town Road Lane | GPL-3.0 |
 | NetworkStudio | Development only | Historical metadata 155650; not represented as released | 0.1.0 | Road-furniture placement prototype | Runtime lifecycle and save behaviour are unverified | MIT |
 | Parkify | Development only | Historical metadata 155651; not represented as released | 0.1.0 | Pedestrian-oriented access prototype | Supported scope, routing and teardown are unverified | MIT |
-| DiscordRPC | Unlisted PDX beta | 163323 (Unlisted) / 0.9.3-beta.3 | 0.9.3-beta.3 | Configurable Discord presence | Privacy presets, presence restoration and the refreshed icon are not verified in-game | MIT |
+| DiscordRPC | Unlisted PDX beta | 163323 / 0.9.3-beta.6 | 0.9.3-beta.6 | Configurable Discord presence | Privacy presets, presence restoration and the refreshed icon are not verified in-game | MIT |
 | GrowableModules | Development only | None | none declared | Modular growable-building prototype | Spawn, rendering, service and save/reload behaviour unverified | MIT |
 
 ## Source boundaries
