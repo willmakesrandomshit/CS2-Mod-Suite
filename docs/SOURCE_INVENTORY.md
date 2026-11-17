@@ -7,7 +7,7 @@ is the last locally verified public package version; `source version` is the
 version declared by the included source candidate. A newer source version is
 not evidence that its binary is currently available from Paradox Mods.
 
-All 14 included projects passed a clean Release build on 2026-09-01 with the
+The 14 projects then included passed a clean Release build on 2026-09-01 with the
 installed Cities: Skylines II modding toolchain: 14/14 projects, 0 compile
 errors and 0 compile warnings. That build is a source/toolchain check, not a
 substitute for the outstanding in-game runtime matrices noted below.
@@ -17,7 +17,7 @@ substitute for the outstanding in-game runtime matrices noted below.
 | FastTrack | Public source ready | 155229 / 1.3.4 | 1.3.5-beta.2 | Adaptive native LOD at distant camera heights plus performance monitoring | Opt-in LOD implementation builds; in-game visual and performance regression is pending | MIT |
 | RoadRules | Public source ready | 155436 / 1.4.4 | 1.4.5-beta.1 | Physical-lane access, preferences and closures | Selective class and overlay matrix remains partially verified; some rules are soft preferences | MIT |
 | SaveGuard | Public source ready | 155424 / 1.2.3 | 1.2.4-beta.1 | Restore points and restored copies | Recovery is never guaranteed; restored-copy load coverage is incomplete | MIT |
-| TrafficStressLab | Public source ready | 155230 / 1.5.4 | 1.5.5-beta.1 | Additional bounded native road-trip requests | High multipliers are experimental; requests are not guaranteed visible vehicles | MIT |
+| TrafficStressLab | Public source ready | 155230 / 1.5.4 | 1.5.7-beta.1 | Additional bounded native road-trip requests | High multipliers are experimental; requests are not guaranteed visible vehicles | MIT |
 | AccessStudio | Public source ready | 156034 / 0.3.2-alpha.1 | 0.3.3-alpha.1 | Manual service-access editing | Remote Service Point is experimental and support varies by building/network | MIT |
 | CityPulse | Public source ready | 155450 / 3.0.3 | 3.0.4-beta.1 | Read-only city observations and heuristics | Diagnostic scores are clues, not proof of a cause | MIT |
 | ContourPlus | Public source ready | 155427 / 1.2.4 | 1.2.5-beta.1 | Terrain contours and grade-planning readouts | Bounded sampling can raise effective intervals; not surveying data | MIT |
@@ -27,11 +27,12 @@ substitute for the outstanding in-game runtime matrices noted below.
 | MagicMarking | Public source ready with upstream attribution | 155247 / 2.4.0 | 2.4.1-beta.1 | Snap-and-paint road-marking editor | Visual only; incompatible with simultaneously enabling Town Road Lane | GPL-3.0 |
 | NetworkStudio | Development only | Historical metadata 155650; not represented as released | 0.1.0 | Road-furniture placement prototype | Runtime lifecycle and save behaviour are unverified | MIT |
 | Parkify | Development only | Historical metadata 155651; not represented as released | 0.1.0 | Pedestrian-oriented access prototype | Supported scope, routing and teardown are unverified | MIT |
-| DiscordRPC | Development only | None | 0.9.0-beta.1 | Configurable Discord presence prototype | Visible client acceptance has not passed a release gate | MIT |
+| DiscordRPC | Unlisted PDX beta | 163323 (Unlisted) / 0.9.3-beta.3 | 0.9.3-beta.3 | Configurable Discord presence | Privacy presets, presence restoration and the refreshed icon are not verified in-game | MIT |
+| GrowableModules | Development only | None | none declared | Modular growable-building prototype | Spawn, rendering, service and save/reload behaviour unverified | MIT |
 
 ## Source boundaries
 
-- Public source is limited to the 14 folders listed above plus root
+- Public source is limited to the 15 folders listed above plus root
   documentation and build/verification scripts.
 - Old experiments, duplicate source snapshots, downloaded PDX packages,
   decompiled game/mod source, release staging folders, saves, logs, dumps,
