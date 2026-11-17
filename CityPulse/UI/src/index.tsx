@@ -63,12 +63,35 @@ export const CityPulseToolbarButton: React.FC = () => {
 
 };
 
+const TREND_MAX = 60;
+
+// Session-only sparkline of the master score. Not saved; resets when the panel reloads.
+const TrendSparkline: React.FC<{ points: number[] }> = ({ points }) => {
+  if (points.length < 2) {
+    return <span className="section-subtitle">Trend appears after a few scans.</span>;
+  }
+  const w = 160, h = 36;
+  const step = w / (TREND_MAX - 1);
+  const coords = points.map((v, i) => `${(i * step).toFixed(1)},${(h - (Math.max(0, Math.min(100, v)) / 100) * h).toFixed(1)}`).join(' ');
+  const first = points[0], last = points[points.length - 1];
+  const delta = last - first;
+  return (
+    <div className="trend-spark" title="Master heuristic score over this session's scans. Not a measurement of cause.">
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Score trend">
+        <polyline fill="none" stroke="currentColor" strokeWidth="2" points={coords} />
+      </svg>
+      <span className="section-subtitle">{delta === 0 ? 'No change' : (delta > 0 ? '+' : '') + delta + ' pts'} over {points.length} scans</span>
+    </div>
+  );
+};
+
 export const CityPulsePanel: React.FC = () => {
   const [visible, setVisible] = useState<boolean>(visibleBinding.value);
   const [activeTab, setActiveTab] = useState<'overview' | 'traffic' | 'transit' | 'parking' | 'services' | 'buildings' | 'network'>('overview');
   const [selectedAlert, setSelectedAlert] = useState<CityAlert | null>(null);
   const [showAdvanced, setShowAdvanced] = useRememberedPreference("CityPulse.showAdvanced", false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [trend, setTrend] = useState<number[]>([]);
 
   const [overview, setOverview] = useState<MasterOverview>({
     masterCityHealthScore: 0,
@@ -110,7 +133,11 @@ export const CityPulsePanel: React.FC = () => {
     const subVisible = visibleBinding.subscribe(setVisible);
 
     if (typeof engine !== 'undefined') {
-      engine.on('cityPulse.overview', (val: MasterOverview) => { if (val) setOverview(val); });
+      engine.on('cityPulse.overview', (val: MasterOverview) => {
+        if (!val) return;
+        setOverview(val);
+        if (val.masterCityHealthScore > 0) setTrend(t => [...t, val.masterCityHealthScore].slice(-TREND_MAX));
+      });
       engine.on('cityPulse.alerts', (val: CityAlert[]) => setAlerts(val || []));
       engine.on('cityPulse.traffic', (val: any) => { if (val) setTrafficSummary(val); });
       engine.on('cityPulse.trafficBottlenecks', (val: any[]) => setTrafficBottlenecks(val || []));
@@ -283,6 +310,7 @@ export const CityPulsePanel: React.FC = () => {
                 </p>
               </div>
               <div className="health-right">
+                <TrendSparkline points={trend} />
                 <span className="section-subtitle">Updates automatically</span>
               </div>
             </div>
