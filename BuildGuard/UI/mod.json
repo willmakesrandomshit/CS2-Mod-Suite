@@ -1,0 +1,8 @@
+{
+  "id": "BuildGuard",
+  "name": "BuildGuard",
+  "version": "0.1.0-alpha.1",
+  "author": "progamer8785",
+  "description": "See what an edit will remove or change, from the game's own preview, before you commit to it. Read-only.",
+  "scripts": ["BuildGuard.mjs"]
+}

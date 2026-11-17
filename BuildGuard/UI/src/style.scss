@@ -1,0 +1,19 @@
+.bg-card {
+  position: absolute;
+  top: 140px;
+  right: 24px;
+  width: 340px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  color: #f8fafc;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 12px 14px;
+  pointer-events: none;
+  z-index: 900;
+
+  &.bg-warn { border-color: #f59e0b; }
+  .bg-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .bg-body { margin: 0; font-size: 13px; line-height: 1.45; color: #e2e8f0; }
+  .bg-foot { margin-top: 8px; font-size: 11px; color: #94a3b8; }
+}
