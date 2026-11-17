@@ -1,0 +1,29 @@
+name: Offline checks
+
+# These checks do not need the game, toolchain or any proprietary assembly.
+# Compiling the mods requires a local Cities: Skylines II install (see BUILDING.md).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Portfolio UI logic tests
+        run: |
+          npm ci --no-audit --no-fund --prefix FastTrack/UI
+          node scripts/test-portfolio.cjs
+      - name: Traffic Stress Lab policy tests
+        run: dotnet run --project scripts/TrafficStressTests/TrafficStressTests.csproj

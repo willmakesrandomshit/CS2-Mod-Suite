@@ -148,12 +148,14 @@ namespace CityPulse
             AddBinding(new TriggerBinding("cityPulse", "toggleVisible", () =>
             {
                 m_IsVisible = !m_IsVisible;
+                m_Scheduler.PanelVisible = m_IsVisible;
                 m_VisibleBinding.Update(m_IsVisible);
             }));
 
             AddBinding(new TriggerBinding("cityPulse", "closeVisible", () =>
             {
                 m_IsVisible = false;
+                m_Scheduler.PanelVisible = false;
                 m_VisibleBinding.Update(false);
             }));
 
@@ -219,6 +221,7 @@ namespace CityPulse
             if (World == null || !World.IsCreated) return;
             base.OnGamePreload(purpose, mode);
             m_IsVisible = false;
+            if (m_Scheduler != null) m_Scheduler.PanelVisible = false;
             m_VisibleBinding?.Update(false);
         }
 

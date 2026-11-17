@@ -256,8 +256,17 @@ namespace EventEngine
 
             if (!m_IsOpen) return;
 
+            // Rebuilding every JSON payload each frame allocates heavily for no visible gain;
+            // event phases change on a game-minute scale. User actions still refresh immediately
+            // because they call UpdateUiState directly.
+            float now = UnityEngine.Time.realtimeSinceStartup;
+            if (now < m_NextUiRefresh) return;
+            m_NextUiRefresh = now + 0.25f;
+
             UpdateUiState();
         }
+
+        private float m_NextUiRefresh;
 
         private void SetPanelState(bool open, string tab)
         {

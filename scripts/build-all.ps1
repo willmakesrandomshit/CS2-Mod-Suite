@@ -1,7 +1,8 @@
 param(
     [string]$ToolPath = $env:CSII_TOOLPATH,
     [string]$TownRoadLanePath = $env:TOWN_ROAD_LANE_DLL,
-    [switch]$SkipNpmInstall
+    [switch]$SkipNpmInstall,
+    [switch]$NoDeploy
 )
 
 $ErrorActionPreference = 'Stop'
@@ -17,6 +18,14 @@ if ([string]::IsNullOrWhiteSpace($ToolPath) -or -not (Test-Path -LiteralPath (Jo
 
 $env:CSII_TOOLPATH = [IO.Path]::GetFullPath($ToolPath)
 $logRoot = Join-Path $repo 'artifacts/build-logs'
+$deployArgs = @()
+if ($NoDeploy) {
+    # Redirect the toolchain's post-build deploy so a verification build does not
+    # overwrite the Mods already installed for the game.
+    $deployRoot = Join-Path $repo 'artifacts/deploy'
+    New-Item -ItemType Directory -Path $deployRoot -Force | Out-Null
+    $deployArgs = @("-p:LocalModsPath=$deployRoot")
+}
 New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
 
 $projects = @(
@@ -33,7 +42,8 @@ $projects = @(
     @{ Name='MagicMarking'; Project='MagicMarking/src/MarkingStudio/MarkingStudio.csproj'; UI='MagicMarking/src/MarkingStudioUI' },
     @{ Name='NetworkStudio'; Project='NetworkStudio/NetworkStudio.csproj'; UI='NetworkStudio/UI' },
     @{ Name='Parkify'; Project='Parkify/Parkify.csproj'; UI='Parkify/UI' },
-    @{ Name='DiscordRPC'; Project='DiscordRPC/DiscordRPC.csproj'; UI='DiscordRPC/UI' }
+    @{ Name='DiscordRPC'; Project='DiscordRPC/DiscordRPC.csproj'; UI='DiscordRPC/UI' },
+    @{ Name='GrowableModules'; Project='GrowableModules/GrowableModulesPrototype.csproj'; UI=$null }
 )
 
 if ([string]::IsNullOrWhiteSpace($TownRoadLanePath)) {
@@ -45,8 +55,8 @@ if ([string]::IsNullOrWhiteSpace($TownRoadLanePath)) {
 }
 
 foreach ($item in $projects) {
-    $ui = Join-Path $repo $item.UI
-    if (-not $SkipNpmInstall) {
+    $ui = if ($item.UI) { Join-Path $repo $item.UI } else { $null }
+    if ($ui -and -not $SkipNpmInstall) {
         Push-Location $ui
         try {
             if (Test-Path -LiteralPath 'package-lock.json') { npm ci --no-audit --no-fund }
@@ -64,12 +74,12 @@ foreach ($item in $projects) {
         $extra += "-p:TownRoadLanePath=$TownRoadLanePath"
     }
 
-    dotnet restore $project --nologo -v:minimal @extra
+    dotnet restore $project --nologo -v:minimal @extra @deployArgs
     if ($LASTEXITCODE -ne 0) { throw "Restore failed for $($item.Name)" }
-    dotnet clean $project -c Release --nologo -v:quiet @extra
+    dotnet clean $project -c Release --nologo -v:quiet @extra @deployArgs
     if ($LASTEXITCODE -ne 0) { throw "Clean failed for $($item.Name)" }
     $log = Join-Path $logRoot "$($item.Name).log"
-    dotnet build $project -c Release --no-restore --nologo -v:minimal @extra "/flp:logfile=$log;verbosity=minimal"
+    dotnet build $project -c Release --no-restore --nologo -v:minimal @extra @deployArgs "/flp:logfile=$log;verbosity=minimal"
     if ($LASTEXITCODE -ne 0) { throw "Build failed for $($item.Name); see $log" }
 }
 

@@ -231,7 +231,7 @@ namespace Colossal.UtilitySuite.Interop
             }
             catch (Exception ex)
             {
-                return $"Failed to export support report: {ex.Message}";
+                return $"Failed to export support report: {SuiteLogger.Sanitize(ex.Message)}";
             }
         }
 

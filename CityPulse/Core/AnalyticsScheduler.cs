@@ -74,6 +74,21 @@ namespace CityPulse
 
         // Execution Timers & Staggered Cadence
         private int m_FrameCounter = 0;
+
+        /// <summary>
+        /// When the panel is closed nothing displays these scans, so they run at a much slower cadence
+        /// (about every 5 s) instead of sampling the whole city on the main thread twice a second.
+        /// </summary>
+        public bool PanelVisible
+        {
+            get => m_PanelVisible;
+            set
+            {
+                if (value && !m_PanelVisible) m_FrameCounter = 299; // scan on the next frame
+                m_PanelVisible = value;
+            }
+        }
+        private bool m_PanelVisible;
         private int m_BuildingScanCursor = 0;
         private const int kBuildingBatchSize = 2048;
         private readonly List<BuildingIssueEntry> m_BuildingScanIssues = new List<BuildingIssueEntry>(20);
@@ -214,6 +229,7 @@ namespace CityPulse
             if (World == null || !World.IsCreated) return;
 
             m_FrameCounter++;
+            if (!m_PanelVisible && m_FrameCounter % 300 != 0) return; // closed: one full scan every ~5 s
 
             // Staggered bounded execution across frames to preserve 60+ FPS
             if (m_FrameCounter % 30 == 0) // Twice per second: Traffic & Transit
