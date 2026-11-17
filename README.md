@@ -26,7 +26,7 @@ Repository: https://github.com/willmakesrandomshit/CS2-Mod-Suite
 | Magic Marking | Snap-and-paint road-marking editor | [155247](https://mods.paradoxplaza.com/mods/155247/Windows) | Beta; GPL-3.0 fork | [MagicMarking](MagicMarking/) |
 | Network Studio | Road-furniture placement prototype | Not publicly released | Development only | [NetworkStudio](NetworkStudio/) |
 | Parkify | Pedestrian-oriented park-access prototype | Not publicly released | Development only | [Parkify](Parkify/) |
-| Discord RPC | Configurable Discord presence prototype | Not publicly released | Development only | [DiscordRPC](DiscordRPC/) |
+| Discord RPC | Configurable Discord presence with privacy controls | Public beta, item 163323 | Beta; some privacy and visual checks remain | [DiscordRPC](DiscordRPC/) |
 
 ## Building
 

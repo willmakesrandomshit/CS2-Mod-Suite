@@ -68,7 +68,7 @@ const ProbePanel: React.FC = () => {
         <button aria-label="Close" onClick={() => trigger('AccessStudio', 'close')}>×</button>
       </header>
       <div className={`as-state ${active ? 'active' : ''}`}>{active ? 'SELECT A BUILDING' : 'PROBE PAUSED'}</div>
-      <PortfolioHelp runtimeGroup={"Portfolio.AccessStudio"} name={"Access Studio"} version={"0.3.3-alpha.1"} steps={["Activate the probe and select a supported building.", "Choose Move Service Access and pick a valid road.", "Use Reset Vanilla to restore the original access."]} note={"Remote access is experimental. Verify service routing in a disposable city."} bindings={portfolioBindings} />
+      <PortfolioHelp runtimeGroup={"Portfolio.AccessStudio"} name={"Access Studio"} version={"0.3.3-alpha.2"} steps={["Activate the probe and select a supported building.", "Choose Move Service Access and pick a valid road.", "Use Reset Vanilla to restore the original access."]} note={"Remote access is experimental. Verify service routing in a disposable city."} bindings={portfolioBindings} />
       <p className="as-status">{status}</p>
       <div className="as-actions">
         <button onClick={() => trigger('AccessStudio', 'activate')}>{active ? 'Selection Tool Active' : 'Select Building'}</button>

@@ -2,7 +2,7 @@
 
 Show what you are doing in Cities: Skylines II on Discord, with a live activity preview and clear controls for what you share.
 
-- **Status:** 0.9.3-beta.3 Unlisted beta, published to PDX Mods
+- **Status:** 0.9.3-beta.6 Public on PDX Mods
 - **PDX:** [Discord RPC on Paradox Mods, item 163323](https://mods.paradoxplaza.com/mods/163323/Windows)
 - **Licence:** MIT
 - **Build:** follow [BUILDING.md](../BUILDING.md); Discord SDK assemblies come from the game and are not bundled
@@ -11,7 +11,7 @@ Show what you are doing in Cities: Skylines II on Discord, with a live activity 
 
 ## Verified so far
 
-Version 0.9.2-beta.2 built with zero warnings or errors and loaded in CSII 1.6.2f1. It connected through the game's Discord SDK and produced accepted callbacks in the disposable Harlaem 2 city with zero failures. The panel was visually checked in-game. Version 0.9.3-beta.3, including the corrected official Discord symbol, is published as Unlisted. The updated icon has build verification but still needs in-game visual confirmation.
+Version 0.9.2-beta.2 built with zero warnings or errors and loaded in CSII 1.6.2f1. It connected through the game's Discord SDK and produced accepted callbacks in the disposable Harlaem 2 city with zero failures. The panel was visually checked in-game. Version 0.9.3-beta.6 is Public on PDX Mods. Its listing was visually checked and now shows the distinct Discord presence cover. The in-game icon has not been rechecked in CSII.
 
 Privacy preset actions and vanilla-presence restoration remain unverified. Before calling the public beta fully verified, test privacy presets, disabling enhanced presence, reconnect, and the dismissed failure panel in a disposable city with Discord desktop. Check the actual Discord client and inspect the DiscordRPC log for failed callbacks and repeated errors.
 
