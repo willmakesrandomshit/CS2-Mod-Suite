@@ -33,3 +33,11 @@ This is a targeted runtime smoke pass, not full functional QA of every suite mod
 - Replaced the hand-drawn Discord-like mark with the official unmodified Discord Symbol SVG from Discord's Brand Guidelines. The toolbar icon matches that downloaded SVG byte-for-byte; the cover artwork uses the official symbol path without edits. Rendered and visually inspected the refreshed 512×512 PNG.
 - Built 0.9.3-beta.3 Debug and Release with 0 warnings and 0 errors; webpack succeeded. Release DLL and UI bundle hashes matched the local deployment and uploaded package.
 - `ModPublisher.exe NewVersion` succeeded for item `163323`, reported Access Control Level State `Unlisted`, and published the corrected icon and cover art. The actual updated icon has not been rechecked in-game.
+
+## 2026-10-15 — PDX portfolio thumbnail correction
+
+- PDX was showing stale suite placeholder covers for Access Studio, CityMCP, and Discord RPC although their source packages had distinct artwork. Root cause: ModPublisher resolves the relative thumbnail path from its working directory, not from the configuration file's directory.
+- Published Access Studio `0.3.3-alpha.2` (item `156034`), CityMCP `0.1.0-beta.13` (item `159045`), and Discord RPC `0.9.3-beta.6` (item `163323`) with Public access and each correct project thumbnail. ModPublisher confirmed successful uploads; the live PDX pages show the new versions and artwork.
+- Access Studio Release built with 0 warnings and 0 errors. CityMCP reused its already-deployed package DLL, which matched the package copy; only listing metadata changed. Discord RPC Release/UI had passed immediately before its thumbnail republish.
+- Contour Plus and SaveGuard already display product-specific covers. `Middleham Traffic fix for biffa pls` (item `122281`) is a 61.79 MB Savegame with a representative city screenshot thumbnail. Its package is not local and PDX requires login to download it, so it was left unchanged.
+- This verifies the listing artwork only. It does not add runtime verification to the mods. Discord RPC's game toolbar icon still needs a fresh in-game check.

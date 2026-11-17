@@ -30,7 +30,7 @@ Repository: https://github.com/willmakesrandomshit/CS2-Mod-Suite
 | Magic Marking | Snap-and-paint road-marking editor | [155247](https://mods.paradoxplaza.com/mods/155247/Windows) | Beta; GPL-3.0 fork | [MagicMarking](MagicMarking/) |
 | Network Studio | Road-furniture placement prototype | Not publicly released | Development only | [NetworkStudio](NetworkStudio/) |
 | Parkify | Pedestrian-oriented park-access prototype | Not publicly released | Development only | [Parkify](Parkify/) |
-| Discord RPC | Configurable Discord presence | [163323](https://mods.paradoxplaza.com/mods/163323/Windows) (Unlisted) | Beta; unlisted on PDX, privacy presets unverified | [DiscordRPC](DiscordRPC/) |
+| Discord RPC | Configurable Discord presence with privacy controls | [163323](https://mods.paradoxplaza.com/mods/163323/Windows) (visibility unverified; repo history says Unlisted, local notes say Public) | Beta; privacy presets and visual checks not verified in-game | [DiscordRPC](DiscordRPC/) |
 | Modular Growables | Experimental modular growable-building prototype | Not publicly released | Development only | [GrowableModules](GrowableModules/) |
 
 ## Building

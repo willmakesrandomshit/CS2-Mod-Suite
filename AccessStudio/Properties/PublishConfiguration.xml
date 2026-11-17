@@ -15,9 +15,13 @@ CURRENT LIMITATIONS
 Use a disposable test city. Supported buildings and networks vary; vanilla pathfinding still decides actual service routing. Remote mode, service combinations, target-road deletion and save/load behavior do not have complete runtime coverage. Overrides are transient and cleanup is attempted on city transition/unload; this is not a save-safety guarantee.]]></LongDescription>
   <Thumbnail Value="Properties/Thumbnail.png" />
   <Tag Value="Code Mod" />
-  <ModVersion Value="0.3.3-alpha.1" />
+  <ModVersion Value="0.3.3-alpha.2" />
   <GameVersion Value="1.6.*" />
-  <ChangeLog><![CDATA[0.3.3-alpha.1 — Maintenance beta
+  <ChangeLog><![CDATA[0.3.3-alpha.2 — Thumbnail refresh
+
+• Replaced the generic suite placeholder with Access Studio's service-frontage plan artwork.
+
+0.3.3-alpha.1 — Maintenance beta
 
 Added restoration of transient access overrides on city preload and system destruction. Remote access remains early alpha; no new service-routing verification is claimed.
 

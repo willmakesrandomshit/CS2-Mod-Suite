@@ -3,7 +3,7 @@
 Early-alpha manual editing of supported building service-access connections,
 including an experimental remote service point.
 
-- **Source status:** 0.3.3-alpha.1
+- **Source status:** 0.3.3-alpha.2
 - **PDX:** [mod 156034](https://mods.paradoxplaza.com/mods/156034/Windows)
 - **Licence:** MIT
 - **Build:** follow [BUILDING.md](../BUILDING.md); C# is in the project root and React UI source is in `UI/src`
