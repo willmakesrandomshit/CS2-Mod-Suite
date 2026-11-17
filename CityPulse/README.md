@@ -3,7 +3,7 @@
 Read-only observations and heuristics from sampled traffic, transit, parking,
 service, building and network data.
 
-- **Source status:** 3.0.4-beta.1
+- **Source status:** 3.0.4-beta.1 + unreleased session score-trend sparkline (UI only, build-verified, not tested in-game)
 - **PDX:** [mod 155450](https://mods.paradoxplaza.com/mods/155450/Windows)
 - **Licence:** MIT
 - **Build:** follow [BUILDING.md](../BUILDING.md); analytics are under `Core` and React UI source is under `UI/src`

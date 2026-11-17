@@ -42,6 +42,7 @@ namespace ContourPlus
         private ValueBinding<bool> m_HighVisibilityBinding;
 
         private RawValueBinding m_ProfileBinding;
+        private List<ProfileSample> m_LastProfile;
 
         protected override void OnCreate()
         {
@@ -164,7 +165,14 @@ namespace ContourPlus
                 m_CutVolumeBinding.Update(r.EstimatedCutM3);
                 m_FillVolumeBinding.Update(r.EstimatedFillM3);
 
-                m_ProfileBinding.Update();
+                // A raw binding re-serializes on every Update(); topography publishes a new list
+                // only when it resamples, so push the profile only when that list changes.
+                var profile = r.LongitudinalProfile;
+                if (!ReferenceEquals(profile, m_LastProfile))
+                {
+                    m_LastProfile = profile;
+                    m_ProfileBinding.Update();
+                }
             }
 
             var contourSys = ContourOverlaySystem.Instance;

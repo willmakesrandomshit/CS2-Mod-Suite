@@ -24,6 +24,10 @@ remaining development-only/beta UIs, then performs clean Release builds. The
 official toolchain post-processes assemblies and normally deploys each result
 to the local CS2 Mods directory. It does not publish to Paradox Mods.
 
+To verify the build without overwriting the mods installed for the game, add
+`-NoDeploy`; the toolchain then deploys to `artifacts/deploy` instead. For a
+single project, pass `-p:LocalModsPath=<folder>` to `dotnet build`.
+
 ## Build one project
 
 ```powershell

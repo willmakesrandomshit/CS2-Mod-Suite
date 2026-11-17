@@ -569,3 +569,11 @@
   background: rgba(255, 255, 255, 0.035);
   background-image: none;
 }
+
+.trend-spark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: inherit;
+}

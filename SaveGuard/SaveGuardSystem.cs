@@ -260,6 +260,23 @@ namespace SaveGuard
             }
         }
 
+        // Copy to a temporary name and rename on success so an interrupted copy never leaves a
+        // truncated .cok that looks like a real save or restore point.
+        private static void CopyAtomically(string src, string dest)
+        {
+            string temp = dest + ".partial";
+            try
+            {
+                File.Copy(src, temp, true);
+                File.Move(temp, dest);
+            }
+            catch
+            {
+                try { if (File.Exists(temp)) File.Delete(temp); } catch { }
+                throw;
+            }
+        }
+
         public string CreateRestorePoint()
         {
             try
@@ -283,7 +300,7 @@ namespace SaveGuard
                 // oldest restore point first, so a failed copy could reduce the user's recovery
                 // history—and could even delete the selected source when copying a restore point.
                 dest = GetUniqueDestination(dest);
-                File.Copy(src, dest, false);
+                CopyAtomically(src, dest);
 
                 // Enforce retention only after a complete new copy exists.
                 var existing = Directory.GetFiles(m_RestorePointsRoot, "*.cok")
@@ -295,7 +312,10 @@ namespace SaveGuard
                     existing.RemoveAt(0);
                     if (!string.Equals(prune, dest, StringComparison.OrdinalIgnoreCase))
                     {
-                        File.Delete(prune);
+                        // Pruning is housekeeping: the new restore point already exists, so a
+                        // locked or read-only old file must not make creation report failure.
+                        try { File.Delete(prune); }
+                        catch (Exception pruneEx) { Mod.Log.Warn($"SaveGuard could not prune old restore point: {pruneEx.Message}"); }
                     }
                 }
 
@@ -328,7 +348,7 @@ namespace SaveGuard
                 // Non-destructive copy to saves folder
                 Directory.CreateDirectory(m_SavesRoot);
                 dest = GetUniqueDestination(dest);
-                File.Copy(src, dest, false);
+                CopyAtomically(src, dest);
                 RefreshTimeline();
                 SelectEntry(dest);
                 LastStatus = $"Successfully restored copy: {Path.GetFileName(dest)} (Original untouched)";
